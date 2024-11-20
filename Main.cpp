@@ -6,6 +6,8 @@
 #include "Customer.h"
 #include "EventLogger.h"
 #include <stdexcept>  // Add this for exception handling
+#include <algorithm> // Add this line if not already included
+
 
 EventLogger logger("event_log.txt");
 
@@ -28,6 +30,13 @@ void addDefaultCars() {
 // Function to display all cars
 void viewAllCars() {
     std::cout << "\n--- Available Cars ---\n";
+
+    // Sort cars by ID in ascending order before displaying
+    std::sort(cars.begin(), cars.end(), [](const Car& a, const Car& b) {
+        return a.getID() < b.getID(); // Sorting by ID in ascending order
+        });
+
+    std::cout << "Number of cars in system: " << cars.size() << std::endl;
     for (const auto& car : cars) {
         car.displayCarInfo();
     }
@@ -127,7 +136,7 @@ void addCar() {
     int newID = cars.size() + 1;
 
     try {
-        // Create and add the car to the system
+        // Exception Handling: Catch any invalid arguments during car creation
         Car newCar(newID, make, model, year, color, costPerDay);
         cars.push_back(newCar);
 
@@ -137,6 +146,7 @@ void addCar() {
 
         std::cout << "Car added successfully!\n";
     }
+    // Catch exceptions and display an error message
     catch (const std::invalid_argument& e) {
         std::cerr << "Error: " << e.what() << std::endl;
     }
@@ -224,9 +234,7 @@ void loadCarsFromFile() {
             std::getline(carFile, color, ',');  // Read the car color
             carFile >> costPerDay;
 
-            std::cout << "Read values: ID=" << id << ", Make=" << make << ", Model=" << model
-                << ", Year=" << year << ", Color=" << color << ", CostPerDay=" << costPerDay << "\n";
-
+            // Exception Handling: Throw if `costPerDay` or `year` is invalid
             try {
                 if (costPerDay <= 0) {
                     throw std::invalid_argument("Invalid cost per day in file.");
@@ -238,6 +246,7 @@ void loadCarsFromFile() {
                 Car loadedCar(id, make, model, year, color, costPerDay);
                 cars.push_back(loadedCar);
             }
+            // Catch exceptions and log the error message
             catch (const std::invalid_argument& e) {
                 std::cerr << "Error loading car from file: " << e.what() << std::endl;
             }
@@ -260,5 +269,6 @@ int main() {
     loadCarsFromFile();  // Load cars from file before displaying the menu
     addDefaultCars();
     displayMenu();
+    //viewAllCars(); 
     return 0;
 }
