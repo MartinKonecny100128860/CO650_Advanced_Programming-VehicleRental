@@ -1,0 +1,14 @@
+
+Car Rented: Nissan Skyline R34 GT-R V-Spec II 2001 Color: Blue by martin konecny. Cost Per Day: £1200
+Car Added: nissan sylvia 2002 Color: white. Cost Per Day: £500
+Car Added: nissan sylvia 2002 Color: purple. Cost Per Day: £400
+Car Added: porsche 911 1998 Color: white. Cost Per Day: £150
+Car Added: Nissan Sylvia 2002 Color: Blue. Cost Per Day: £800
+Car Added: Porsche 911 1998 Color: Whitw. Cost Per Day: £150
+Car Added: nissan 350z 2004 Color: 250. Cost Per Day: £250
+Car Added: porsche 911 1998 Color: black. Cost Per Day: £250
+Car Added: nissan sylvia 2002 Color: pink. Cost Per Day: £250
+Car Added: Porsche 911 2012 Color: Black. Cost Per Day: £125
+Car Added: Nissan 350Z 2004 Color: Grey. Cost Per Day: £250
+Car Added: Nissan 350Z 2004 Color: Grey. Cost Per Day: £250
+Car Added: Nissan Sylvia 1999 Color: Blue. Cost Per Day: £250
