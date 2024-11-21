@@ -10,7 +10,7 @@ void EventLogger::logCarRental(const Car& car, const std::string& customerName) 
     if (logFile.is_open()) {
         logFile << "Car Rented: " << car.getCarInfo()
             << " by " << customerName
-            << ". Cost Per Day: £" << car.costPerDay << "\n";
+            << ". Cost Per Day: ?" << car.costPerDay << "\n";
         logFile.close();
     }
     else {
@@ -23,7 +23,7 @@ void EventLogger::logCarAddition(const Car& car) {
     std::ofstream logFile(logFileName, std::ios::app);
     if (logFile.is_open()) {
         logFile << "Car Added: " << car.getCarInfo()
-            << ". Cost Per Day: £" << car.costPerDay << "\n";
+            << ". Cost Per Day: ?" << car.costPerDay << "\n";
         logFile.close();
     }
     else {
@@ -42,5 +42,4 @@ void EventLogger::saveCarToFile(const Car& car) {
         std::cerr << "Failed to open cars.txt for writing.\n";
     }
 }
-
 

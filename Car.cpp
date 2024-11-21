@@ -1,4 +1,4 @@
-#include "Car.h"
+ï»¿#include "Car.h"
 
 // CONSTRUCTOR: Initializes the car's attributes when a new Car object is created.
 Car::Car(int id, const std::string& make, const std::string& model, int year, const std::string& color, double costPerDay)
@@ -44,5 +44,5 @@ double Car::calculateRentalCost(int rentalDuration) const {
 // Display car information
 void Car::displayCarInfo() const {
     std::cout << "ID: " << id << " - " << getCarInfo()
-        << ", Cost per day: £" << costPerDay << ", Available: " << (available ? "Yes" : "No") << std::endl;
+        << ", Cost per day: GBP " << costPerDay << ", Available: " << (available ? "Yes" : "No") << std::endl;
 }

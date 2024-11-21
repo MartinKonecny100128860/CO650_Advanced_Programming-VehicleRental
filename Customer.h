@@ -8,7 +8,7 @@ private:
     std::string firstName;
     std::string lastName;
     std::string contactDetails;
-    int rentalDuration;  // in days
+    int rentalDuration;
 
 public:
     // Constructor
