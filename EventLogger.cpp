@@ -1,45 +1,58 @@
-#include "EventLogger.h"
+#include "eventlogger.h"
 #include <iostream>
+#include <iomanip>
+#include <chrono>
+#include <ctime>
 
-// Constructor: Opens a log file for writing
-EventLogger::EventLogger(const std::string& fileName) : logFileName(fileName) {}
+// Constructor
+EventLogger::EventLogger(const std::string& filePath) : logFilePath(filePath) {}
 
-// Logs car rental events Demonstrates FRIENDSHIP: Accesses Car's private members directly
-void EventLogger::logCarRental(const Car& car, const std::string& customerName) {
-    std::ofstream logFile(logFileName, std::ios::app);
-    if (logFile.is_open()) {
-        logFile << "Car Rented: " << car.getCarInfo()
-            << " by " << customerName
-            << ". Cost Per Day: ?" << car.costPerDay << "\n";
-        logFile.close();
-    }
-    else {
-        std::cerr << "Failed to open log file.\n";
-    }
+// Destructor
+EventLogger::~EventLogger() {
+    // Optional cleanup, if necessary
 }
 
-// Logs car addition events
-void EventLogger::logCarAddition(const Car& car) {
-    std::ofstream logFile(logFileName, std::ios::app);
-    if (logFile.is_open()) {
-        logFile << "Car Added: " << car.getCarInfo()
-            << ". Cost Per Day: ?" << car.costPerDay << "\n";
-        logFile.close();
+// Log an event
+void EventLogger::logEvent(const std::string& eventMessage) {
+    // Lock mutex to ensure thread-safe access
+    std::lock_guard<std::mutex> lock(logMutex);
+
+    // Open file in append mode
+    std::ofstream logFile(logFilePath, std::ios::app);
+    if (!logFile.is_open()) {
+        std::cerr << "Failed to open log file: " << logFilePath << "\n";
+        return;
     }
-    else {
-        std::cerr << "Failed to open log file.\n";
+
+    // Get current time
+    auto now = std::chrono::system_clock::now();
+    std::time_t currentTime = std::chrono::system_clock::to_time_t(now);
+
+    // Use localtime_s for thread-safe conversion
+    std::tm localTime;
+    if (localtime_s(&localTime, &currentTime) != 0) {
+        std::cerr << "Failed to get local time.\n";
+        return;
     }
+
+    // Write timestamp and event message
+    logFile << "[" << std::put_time(&localTime, "%Y-%m-%d %H:%M:%S") << "] "
+        << eventMessage << "\n";
+
+    logFile.close();
 }
 
-void EventLogger::saveCarToFile(const Car& car) {
-    std::ofstream carFile("cars.txt", std::ios::app);
-    if (carFile.is_open()) {
-        carFile << car.getID() << "," << car.make << "," << car.model << "," << car.year
-            << "," << car.color << "," << car.costPerDay << "\n";
-        carFile.close();
-    }
-    else {
-        std::cerr << "Failed to open cars.txt for writing.\n";
-    }
-}
+// Clear log file
+void EventLogger::clearLogFile() {
+    // Lock mutex to ensure thread-safe access
+    std::lock_guard<std::mutex> lock(logMutex);
 
+    // Open file in truncation mode to clear content
+    std::ofstream logFile(logFilePath, std::ios::trunc);
+    if (!logFile.is_open()) {
+        std::cerr << "Failed to open log file: " << logFilePath << "\n";
+        return;
+    }
+
+    logFile.close();
+}

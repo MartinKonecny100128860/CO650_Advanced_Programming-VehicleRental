@@ -28,23 +28,22 @@ void addDefaultCars() {
     cars.push_back(new Car(6, "Mazda", "RX7", 2000, "Orange", 1000.00));
 }
 
-// Function to display all cars
 void viewAllCars() {
     std::cout << "\n--- Available Cars ---\n";
 
     // Sort cars by ID in ascending order before displaying
-    // POINTERS TO CAR OBJECTS ARE USED TO ACCESS THE DATA
     std::sort(cars.begin(), cars.end(), [](const Car* a, const Car* b) {
-        return a->getID() < b->getID(); // Sorting by ID in ascending order
+        return a->getId() < b->getId(); // Sorting by ID in ascending order
         });
 
-    std::cout << "Number of cars in system: " << cars.size() << std::endl;
+    std::cout << "Number of cars in system: " << cars.size() << "\n";
     for (const auto& car : cars) {
-        // POINTER USED TO CALL THE FUNCTION DISPLAYCARINFO() FOR EACH CAR OBJECT
-        car->displayCarInfo();
+        car->displayCarDetails(); // Display in a single line
     }
 }
 
+
+// Function to rent a car
 void rentCar() {
     std::cout << "Enter the car ID to rent: ";
     int carID;
@@ -52,7 +51,7 @@ void rentCar() {
 
     bool carFound = false;
     for (auto& car : cars) {
-        if (car->getID() == carID && car->getAvailability()) {
+        if (car->getId() == carID && car->isAvailable()) {
             carFound = true;
             std::string firstName, lastName, contactDetails;
             int rentalDuration;
@@ -67,16 +66,16 @@ void rentCar() {
             std::cout << "Enter rental duration in days: ";
             std::cin >> rentalDuration;
 
-            Customer* customer = new Customer(firstName, lastName, contactDetails, rentalDuration);
+            auto* customer = new Customer(firstName, lastName, contactDetails, rentalDuration);
             customer->displayCustomerInfo();
-            double totalCost = car->calculateRentalCost(rentalDuration);
+            double totalCost = car->getCostPerDay() * rentalDuration;
             std::cout << "Total rental cost for " << rentalDuration << " days: £" << totalCost << "\n";
 
-            car->setAvailability(false);
+            car->setAvailable(false);
             users.push_back(customer);
 
             // Log the rental event
-            logger.logCarRental(*car, firstName + " " + lastName);
+            logger.logEvent("Car rented: ID=" + std::to_string(carID) + ", Customer=" + firstName + " " + lastName);
 
             std::cout << "\nCar rented successfully!\n";
             break;
@@ -88,71 +87,43 @@ void rentCar() {
     }
 }
 
+// Function to add a car
 void addCar() {
     std::string make, model, color;
     int year;
     double costPerDay;
 
-    // Prompt for car details
     std::cout << "Enter car make: ";
     std::cin >> make;
-    if (make.empty()) {
-        std::cerr << "Car make cannot be empty!\n";
-        return;
-    }
 
     std::cout << "Enter car model: ";
     std::cin >> model;
-    if (model.empty()) {
-        std::cerr << "Car model cannot be empty!\n";
-        return;
-    }
 
     std::cout << "Enter car year: ";
     std::cin >> year;
-    if (std::cin.fail() || year < 1886 || year > 2100) {  // Validate the year
-        std::cin.clear(); // Clear the error state
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Discard invalid input
-        std::cerr << "Invalid year entered. Please enter a valid year (e.g., 1998).\n";
-        return;
-    }
 
     std::cout << "Enter car color: ";
-    std::cin.ignore();  // Ignore leftover newline character
+    std::cin.ignore();
     std::getline(std::cin, color);
-    if (color.empty()) {
-        std::cerr << "Car color cannot be empty!\n";
-        return;
-    }
 
     std::cout << "Enter cost per day (£): ";
     std::cin >> costPerDay;
-    if (std::cin.fail() || costPerDay <= 0) {  // Validate cost per day
-        std::cin.clear(); // Clear the error state
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Discard invalid input
-        std::cerr << "Invalid cost per day. Please enter a positive number.\n";
-        return;
-    }
 
-    // Generate a new ID based on the current number of cars
     int newID = cars.size() + 1;
 
     try {
-        // Exception Handling: Catch any invalid arguments during car creation
-        Car* newCar = new Car(newID, make, model, year, color, costPerDay);
+        auto* newCar = new Car(newID, make, model, year, color, costPerDay);
         cars.push_back(newCar);
 
-        // Log the car addition and save to file
-        logger.logCarAddition(*newCar);
-        logger.saveCarToFile(*newCar);
-
+        logger.logEvent("Car added: ID=" + std::to_string(newID) + ", Make=" + make + ", Model=" + model);
         std::cout << "Car added successfully!\n";
     }
-    // Catch exceptions and display an error message
-    catch (const std::invalid_argument& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
+    catch (const std::exception& e) {
+        std::cerr << "Error adding car: " << e.what() << "\n";
     }
 }
+
+
 
 // Function to view all users
 void viewUsers() {

@@ -3,22 +3,25 @@
 
 #include <string>
 #include <fstream>
-#include "Car.h"
+#include <mutex>
 
 class EventLogger {
 private:
-    std::string logFileName;  // Name of the log file
+    std::string logFilePath; // Path to the log file
+    std::mutex logMutex;     // Mutex for thread-safe logging
 
 public:
-    // Constructor to initialize the logger with a file name
-    EventLogger(const std::string& fileName);
+    // Constructor
+    explicit EventLogger(const std::string& filePath);
 
-    // Method to log car rental events
-    void logCarRental(const Car& car, const std::string& customerName);
+    // Destructor
+    ~EventLogger();
 
-    // Method to log car addition events
-    void logCarAddition(const Car& car);
-    void saveCarToFile(const Car& car);  // New function to save car to file
+    // Log an event
+    void logEvent(const std::string& eventMessage);
+
+    // Clear log file
+    void clearLogFile();
 };
 
-#endif
+#endif // EVENTLOGGER_H

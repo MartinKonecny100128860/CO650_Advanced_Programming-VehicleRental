@@ -2,10 +2,6 @@
 #define CAR_H
 
 #include <string>
-#include <iostream>
-
-// Forward declare EventLogger
-class EventLogger;
 
 class Car {
 private:
@@ -14,27 +10,27 @@ private:
     std::string model;
     int year;
     std::string color;
-    double costPerDay;  // Cost per day of renting the car
+    double costPerDay;
     bool available;
-
-    // Declare EventLogger as a FRIEND class
-    friend class EventLogger;
 
 public:
     // Constructor
     Car(int id, const std::string& make, const std::string& model, int year, const std::string& color, double costPerDay);
 
-    // Getters and Setters
-    bool getAvailability() const;
-    void setAvailability(bool availability);
+    // Getters
+    int getId() const;
+    std::string getMake() const;
+    std::string getModel() const;
+    int getYear() const;
+    std::string getColor() const;
+    double getCostPerDay() const;
+    bool isAvailable() const;
 
-    // Get car details
-    int getID() const;
-    std::string getCarInfo() const;
-    double calculateRentalCost(int rentalDuration) const;
+    // Setters
+    void setAvailable(bool availability);
 
-    // Method to display car details
-    void displayCarInfo() const;
+    // Display car details
+    void displayCarDetails() const;
 };
 
-#endif
+#endif // CAR_H
