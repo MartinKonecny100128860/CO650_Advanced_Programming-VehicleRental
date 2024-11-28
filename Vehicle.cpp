@@ -1,5 +1,4 @@
 #include "Vehicle.h"
-#include <stdexcept>
 
 Vehicle::Vehicle(int id, const std::string& make, const std::string& model, int year, const std::string& color, double costPerDay)
     : id(id), make(make), model(model), year(year), color(color), costPerDay(costPerDay) {

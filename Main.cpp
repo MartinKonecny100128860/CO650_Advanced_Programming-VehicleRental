@@ -18,7 +18,7 @@ EventLogger logger("event_log.txt");
 // Declare the list of cars and users (using pointers)
 std::vector<Customer*> users;
 std::vector<Vehicle*> vehicles;
-
+std::vector<Car*> car;
 // Function to add default vehicles to the system
 void addDefaultCars() {
     vehicles.push_back(new Car(1, "Nissan", "Skyline R34 GT-R V-Spec II", 2001, "Blue", 1200.00));
@@ -29,19 +29,13 @@ void addDefaultCars() {
     vehicles.push_back(new Car(6, "Mazda", "RX7", 2000, "Orange", 1000.00));
 }
 
-// Function to display all vehicles
-void viewAllCars() {
-    std::cout << "\n--- Available Vehicles ---\n";
-
-    std::sort(vehicles.begin(), vehicles.end(), [](const Vehicle* a, const Vehicle* b) {
-        return a->getID() < b->getID(); // Sorting by ID in ascending order
-        });
-
-    std::cout << "Number of vehicles in system: " << vehicles.size() << std::endl;
-    for (const auto& vehicle : vehicles) {
-        vehicle->displayInfo();  // Polymorphism: calls Car's displayInfo method
+void viewVehicles() {
+    // No need to declare a new local vector, just use the global vehicles vector
+    for (auto vehicle : vehicles) {
+        vehicle->displayInfo();  // Calls Car's displayInfo method
     }
 }
+
 
 void rentCar() {
     std::cout << "Enter the car ID to rent: ";
@@ -182,7 +176,7 @@ bool login() {
 }
 
 // Define function pointers for the menu
-void (*menuFunctions[])() = { viewAllCars, rentCar, addCar, viewUsers };
+void (*menuFunctions[])() = { viewVehicles, rentCar, addCar, viewUsers };
 
 // Update the displayMenu function to use function pointers
 void displayMenu() {
@@ -252,9 +246,10 @@ void loadCarsFromFile() {
 // Main function
 int main() {
     setlocale(LC_ALL, "");  // Set the locale to support special characters
-    addDefaultCars();  // Add some default cars
+   // addDefaultCars();  // Add some default cars
 
     if (login()) {
+        addDefaultCars();
         loadCarsFromFile();  // Load cars from file on startup
         displayMenu();
     }

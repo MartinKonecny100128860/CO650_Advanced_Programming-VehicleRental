@@ -2,24 +2,27 @@
 #define CAR_H
 
 #include "Vehicle.h"
-#include <iostream>
 
 class Car : public Vehicle {
 private:
     bool available;
 
 public:
-    // Constructor
+    // Constructor for the Car class
     Car(int id, const std::string& make, const std::string& model, int year, const std::string& color, double costPerDay);
 
-    // Overriding methods from Vehicle
-    bool getAvailability() const override;
-    void setAvailability(bool availability) override;
-    void displayInfo() const override;
-    double calculateRentalCost(int rentalDuration) override;
-    // Overloaded displayCarInfo methods
-  void displayCarInfo() const override;  // Basic info
-  void displayCarInfo(bool includeCostAndAvailability) const override;  // Detailed info with cost and availability
+    // Getter and Setter for availability
+    bool getAvailability() const;
+    void setAvailability(bool availability);
+
+    // Overridden method for displaying information about the car
+    void displayCarInfo(bool includeCostAndAvailability) const override;
+
+    // Overridden method for displaying more detailed info about the car
+    void displayInfo() const override;  // Polymorphic behavior
+
+    // Custom method to calculate rental cost
+    double calculateRentalCost(int rentalDuration);
 };
 
 #endif

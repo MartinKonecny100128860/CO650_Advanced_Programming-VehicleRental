@@ -2,9 +2,8 @@
 #define VEHICLE_H
 
 #include <string>
-
-// Forward declare EventLogger
-class EventLogger;
+#include <iostream>
+#include <stdexcept>
 
 class Vehicle {
 protected:
@@ -13,27 +12,28 @@ protected:
     std::string model;
     int year;
     std::string color;
-    double costPerDay;  // Cost per day of renting the car
-
-    // Declare EventLogger as a FRIEND class
-    friend class EventLogger;
+    double costPerDay;
 
 public:
-    // Constructor
     Vehicle(int id, const std::string& make, const std::string& model, int year, const std::string& color, double costPerDay);
+    std::string getMake() const { return make; }
+    std::string getModel() const { return model; }
+    std::string getColor() const { return color; }
+    int getYear() const { return year; }
+    virtual ~Vehicle() = default; // Virtual destructor for proper cleanup in derived classes
 
-    // Getters and Setters
     int getID() const;
     std::string getCarInfo() const;
-    double getCostPerDay() const; // Getter for costPerDay
+    double getCostPerDay() const;
+    virtual bool getAvailability() const = 0;  // Pure virtual method, forcing Car to implement
+    virtual void setAvailability(bool availability) = 0;  // Pure virtual method
+    virtual double calculateRentalCost(int rentalDuration) = 0;  // Pure virtual method
+    // Virtual method for polymorphism
+    virtual void displayInfo() const = 0;  // Pure virtual function (abstract method)
+    virtual void displayCarInfo(bool includeCostAndAvailability) const {
+        std::cout << "Vehicle ID: " << id << " - " << getCarInfo() << std::endl;
 
-    // Abstract method for availability (to be overridden in Car class)
-    virtual bool getAvailability() const = 0;
-    virtual void setAvailability(bool availability) = 0;
-    virtual void displayInfo() const = 0;
-    virtual double calculateRentalCost(int rentalDuration) = 0;
-    virtual void displayCarInfo() const = 0;
-    virtual void displayCarInfo(bool includeCostAndAvailability) const = 0;
+    }
 };
 
 #endif
