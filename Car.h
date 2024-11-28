@@ -1,41 +1,25 @@
 #ifndef CAR_H
 #define CAR_H
 
-#include <string>
+#include "Vehicle.h"
 #include <iostream>
 
-// Forward declare EventLogger
-class EventLogger;
-
-class Car {
+class Car : public Vehicle {
 private:
-    int id;
-    std::string make;
-    std::string model;
-    int year;
-    std::string color;
-    double costPerDay;  // Cost per day of renting the car
     bool available;
-
-    // Declare EventLogger as a FRIEND class
-    friend class EventLogger;
 
 public:
     // Constructor
     Car(int id, const std::string& make, const std::string& model, int year, const std::string& color, double costPerDay);
 
-    // Getters and Setters
-    bool getAvailability() const;
-    void setAvailability(bool availability);
-
-    // Get car details
-    int getID() const;
-    std::string getCarInfo() const;
-    double calculateRentalCost(int rentalDuration) const;
-
+    // Overriding methods from Vehicle
+    bool getAvailability() const override;
+    void setAvailability(bool availability) override;
+    void displayInfo() const override;
+    double calculateRentalCost(int rentalDuration) override;
     // Overloaded displayCarInfo methods
-    void displayCarInfo() const; // Basic info
-    void displayCarInfo(bool includeCostAndAvailability) const; // Detailed info with cost and availability
+  void displayCarInfo() const override;  // Basic info
+  void displayCarInfo(bool includeCostAndAvailability) const override;  // Detailed info with cost and availability
 };
 
 #endif

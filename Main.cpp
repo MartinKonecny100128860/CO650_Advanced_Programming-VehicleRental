@@ -1,50 +1,47 @@
 ﻿#include <iostream>
-#include <locale> 
+#include <locale>
 #include <vector>
 #include <string>
 #include "Car.h"
 #include "Customer.h"
 #include "EventLogger.h"
 #include <stdexcept>
-#include <algorithm> 
+#include <algorithm>
+#include <fstream>
+#include <limits>
 
-// Friendship is demonstarted here in the main class.
+// Friendship is demonstrated here in the main class.
 // Event logger takes information from car class.
-// Then logs it in a text file. 
+// Then logs it in a text file.
 EventLogger logger("event_log.txt");
 
-
 // Declare the list of cars and users (using pointers)
-std::vector<Car*> cars;
 std::vector<Customer*> users;
+std::vector<Vehicle*> vehicles;
 
-// Function to add default cars to the system
+// Function to add default vehicles to the system
 void addDefaultCars() {
-    cars.push_back(new Car(1, "Nissan", "Skyline R34 GT-R V-Spec II", 2001, "Blue", 1200.00));
-    cars.push_back(new Car(2, "Toyota", "Supra MK4 TT6 Single Turbo", 1997, "White", 700.00));
-    cars.push_back(new Car(3, "Honda", "NSX NA1", 1991, "Red", 800.00));
-    cars.push_back(new Car(4, "Mazda", "RX7", 2000, "Silver with Fortune Body Kit", 1000.00));
-    cars.push_back(new Car(5, "Mitsubishi", "Lancer Evo", 2001, "White", 600.00));
-    cars.push_back(new Car(6, "Mazda", "RX7", 2000, "Orange", 1000.00));
+    vehicles.push_back(new Car(1, "Nissan", "Skyline R34 GT-R V-Spec II", 2001, "Blue", 1200.00));
+    vehicles.push_back(new Car(2, "Toyota", "Supra MK4 TT6 Single Turbo", 1997, "White", 700.00));
+    vehicles.push_back(new Car(3, "Honda", "NSX NA1", 1991, "Red", 800.00));
+    vehicles.push_back(new Car(4, "Mazda", "RX7", 2000, "Silver with Fortune Body Kit", 1000.00));
+    vehicles.push_back(new Car(5, "Mitsubishi", "Lancer Evo", 2001, "White", 600.00));
+    vehicles.push_back(new Car(6, "Mazda", "RX7", 2000, "Orange", 1000.00));
 }
 
-// Function to display all cars (using overloaded displayCarInfo)
+// Function to display all vehicles
 void viewAllCars() {
-    std::cout << "\n--- Available Cars ---\n";
+    std::cout << "\n--- Available Vehicles ---\n";
 
-    // Sort cars by ID in ascending order before displaying
-    // POINTERS TO CAR OBJECTS ARE USED TO ACCESS THE DATA
-    std::sort(cars.begin(), cars.end(), [](const Car* a, const Car* b) {
+    std::sort(vehicles.begin(), vehicles.end(), [](const Vehicle* a, const Vehicle* b) {
         return a->getID() < b->getID(); // Sorting by ID in ascending order
         });
 
-    std::cout << "Number of cars in system: " << cars.size() << std::endl;
-    for (const auto& car : cars) {
-        // Use overloaded function to display detailed car info
-        car->displayCarInfo(true);  // Pass 'true' to display cost and availability
+    std::cout << "Number of vehicles in system: " << vehicles.size() << std::endl;
+    for (const auto& vehicle : vehicles) {
+        vehicle->displayInfo();  // Polymorphism: calls Car's displayInfo method
     }
 }
-
 
 void rentCar() {
     std::cout << "Enter the car ID to rent: ";
@@ -52,7 +49,7 @@ void rentCar() {
     std::cin >> carID;
 
     bool carFound = false;
-    for (auto& car : cars) {
+    for (auto& car : vehicles) {
         if (car->getID() == carID && car->getAvailability()) {
             carFound = true;
             std::string firstName, lastName, contactDetails;
@@ -77,7 +74,8 @@ void rentCar() {
             users.push_back(customer);
 
             // Log the rental event
-            logger.logCarRental(*car, firstName + " " + lastName);
+            logger.logCarRental(dynamic_cast<Car&>(*car), firstName + " " + lastName);
+
 
             std::cout << "\nCar rented successfully!\n";
             break;
@@ -135,13 +133,13 @@ void addCar() {
         return;
     }
 
-    // Generate a new ID based on the current number of cars
-    int newID = cars.size() + 1;
+    // Generate a new ID based on the current number of vehicles
+    int newID = vehicles.size() + 1;
 
     try {
         // Exception Handling: Catch any invalid arguments during car creation
         Car* newCar = new Car(newID, make, model, year, color, costPerDay);
-        cars.push_back(newCar);
+        vehicles.push_back(newCar);
 
         // Log the car addition and save to file
         logger.logCarAddition(*newCar);
@@ -183,8 +181,6 @@ bool login() {
     }
 }
 
-#include <iostream>
-
 // Define function pointers for the menu
 void (*menuFunctions[])() = { viewAllCars, rentCar, addCar, viewUsers };
 
@@ -213,7 +209,6 @@ void displayMenu() {
     } while (choice != 5);
 }
 
-
 void loadCarsFromFile() {
     std::ifstream carFile("cars.txt");
     if (carFile.is_open()) {
@@ -241,47 +236,36 @@ void loadCarsFromFile() {
                 }
 
                 Car* loadedCar = new Car(id, make, model, year, color, costPerDay);
-                cars.push_back(loadedCar);
+                vehicles.push_back(loadedCar);
             }
             catch (const std::invalid_argument& e) {
-                std::cerr << "Error loading car: " << e.what() << std::endl;
+                std::cerr << "Error loading car from file: " << e.what() << "\n";
             }
         }
-
         carFile.close();
     }
     else {
-        std::cerr << "Error opening file!\n";
+        std::cerr << "Error opening cars.txt.\n";
     }
 }
 
-// Cleanup function to delete allocated memory
-void cleanup() {
-    // DELETING DYNAMICALLY ALLOCATED MEMORY FOR CAR POINTERS
-    for (auto& car : cars) {
-        delete car;  // FREEING MEMORY FOR EACH CAR OBJECT
-    }
-    // DELETING DYNAMICALLY ALLOCATED MEMORY FOR CUSTOMER POINTERS
-    for (auto& user : users) {
-        delete user;  // FREEING MEMORY FOR EACH CUSTOMER OBJECT
-    }
-}
-
+// Main function
 int main() {
-    // Load the existing cars from file
-    loadCarsFromFile();
+    setlocale(LC_ALL, "");  // Set the locale to support special characters
+    addDefaultCars();  // Add some default cars
 
-    // Add default cars
-    addDefaultCars();
-
-    // Handle user login
     if (login()) {
-        // Main menu loop
+        loadCarsFromFile();  // Load cars from file on startup
         displayMenu();
     }
 
-    // Cleanup allocated memory before program exits
-    cleanup();
+    // Cleanup dynamically allocated memory
+    for (auto& vehicle : vehicles) {
+        delete vehicle;
+    }
+    for (auto& user : users) {
+        delete user;
+    }
 
     return 0;
 }

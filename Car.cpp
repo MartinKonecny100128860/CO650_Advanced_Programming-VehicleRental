@@ -1,52 +1,33 @@
 ﻿#include "Car.h"
 
-// CONSTRUCTOR: Initializes the car's attributes when a new Car object is created.
 Car::Car(int id, const std::string& make, const std::string& model, int year, const std::string& color, double costPerDay)
-    : id(id), make(make), model(model), year(year), color(color), costPerDay(costPerDay), available(true) {
-    // Exception Handling: Ensure `costPerDay` is positive; throw an exception if invalid
-    if (costPerDay <= 0) {
-        throw std::invalid_argument("Cost per day must be a positive value.");
-    }
-    // Exception Handling: Validate the year is within a realistic range; throw an exception if invalid
-    if (year < 1886 || year > 2100) {
-        throw std::invalid_argument("Year is out of valid range.");
-    }
-}
+    : Vehicle(id, make, model, year, color, costPerDay), available(true) {}
 
-// ENCAPSULATION: private members can't be directly accessed from outside the class.
-// Access is controlled via getters and setters.
 bool Car::getAvailability() const {
     return available;
 }
 
-// Set car availability
 void Car::setAvailability(bool availability) {
     available = availability;
 }
 
-// Get car ID
-int Car::getID() const {
-    return id;
-}
-
-// getCarInfo() ABSTRACTS the details of how car info is stored and returns it as a string.
-std::string Car::getCarInfo() const {
-    return make + " " + model + " " + std::to_string(year) + " Color: " + color;
-}
-
-// calculateRentalCost() ABSTRACTS the calculation logic for the rental cost.
-double Car::calculateRentalCost(int rentalDuration) const {
-    return costPerDay * rentalDuration;
-}
-
-// Overloaded function to display basic car information
 void Car::displayCarInfo() const {
     std::cout << "ID: " << id << " - " << getCarInfo() << std::endl;
 }
 
-// Overloaded function to display car information with cost per day and availability
 void Car::displayCarInfo(bool includeCostAndAvailability) const {
     std::cout << "ID: " << id << " - " << getCarInfo()
         << ", Cost per day: GBP " << costPerDay
         << ", Available: " << (available ? "Yes" : "No") << std::endl;
+}
+// Implementing displayInfo for the Car class
+void Car::displayInfo() const {
+    std::cout << "Car ID: " << id << ", Make: " << make << ", Model: " << model
+        << ", Year: " << year << ", Color: " << color
+        << ", Cost Per Day: £" << costPerDay << std::endl;
+}
+
+// Implementing calculateRentalCost for the Car class
+double Car::calculateRentalCost(int rentalDuration) {
+    return costPerDay * rentalDuration;  // Calculate cost based on the rental duration
 }

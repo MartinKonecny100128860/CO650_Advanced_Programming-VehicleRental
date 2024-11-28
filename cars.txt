@@ -1,2 +1,1 @@
 7,Toyota,Corolla,2020,red,200
-8,Ferrari,Corolla,2020,PINK,500
