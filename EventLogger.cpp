@@ -1,45 +1,51 @@
-#include "EventLogger.h"
-#include <iostream>
+#include "eventlogger.h"
+#include "car.h"
+#include "customer.h"
+#include <stdexcept> // For runtime_error
 
-EventLogger::EventLogger(const std::string& fileName) : logFileName(fileName) {}
+std::ofstream EventLogger::logFile;  // Static member definition
 
-void EventLogger::logCarRental(const Car& car, const std::string& customerName) {
-    std::ofstream logFile(logFileName, std::ios::app);
-    if (logFile.is_open()) {
-        logFile << "Car Rented: " << car.getCarInfo()
-            << " by " << customerName
-            << ". Cost Per Day: £" << car.getCostPerDay() << "\n";
-        logFile.close();
-    }
-    else {
-        std::cerr << "Failed to open log file.\n";
+// Define the EventLogger constructor
+EventLogger::EventLogger(const std::string& filename) {
+    initialize(filename);  // Call initialize to open the log file
+}
+
+// Initialize the log file
+void EventLogger::initialize(const std::string& filename) {
+    logFile.open(filename, std::ios::app);
+    if (!logFile) {
+        throw std::runtime_error("Error opening log file.");
     }
 }
 
 void EventLogger::logCarAddition(const Car& car) {
-    std::ofstream logFile(logFileName, std::ios::app);
-    if (logFile.is_open()) {
-        logFile << "Car Added: " << car.getCarInfo()
-            << ". Cost Per Day: £" << car.getCostPerDay() << "\n";
-        logFile.close();
-    }
-    else {
-        std::cerr << "Failed to open log file.\n";
-    }
+    log("Added car: " + car.getMake() + " " + car.getModel());
 }
 
 void EventLogger::saveCarToFile(const Car& car) {
-    std::ofstream carFile("cars.txt", std::ios::app);
-    if (carFile.is_open()) {
-        carFile << car.getID() << ","
-            << car.getMake() << ","  // Use getter for make
-            << car.getModel() << "," // Use getter for model
-            << car.getYear() << ","  // Assuming there's a getter for year
-            << car.getColor() << "," // Use getter for color
-            << car.getCostPerDay() << "\n";  // Use getter for cost per day
-        carFile.close();
+    std::ofstream outFile("cars.txt", std::ios::app);
+    if (outFile.is_open()) {
+        outFile << car.getID() << "," << car.getMake() << "," << car.getModel()
+            << "," << car.getYear() << "," << car.getColor() << "," << car.getCostPerDay() << "\n";
+        outFile.close();
     }
-    else {
-        std::cerr << "Failed to open cars.txt for writing.\n";
+}
+
+void EventLogger::logCarRental(const Car& car, const Customer& customer) {
+    log("Rented car: " + car.getMake() + " " + car.getModel() +
+        " to " + customer.getFirstName() + " " + customer.getLastName());
+}
+
+// Log a message
+void EventLogger::log(const std::string& message) {
+    if (logFile) {
+        logFile << message << std::endl;
+    }
+}
+
+// Close the log file
+void EventLogger::close() {
+    if (logFile.is_open()) {
+        logFile.close();
     }
 }

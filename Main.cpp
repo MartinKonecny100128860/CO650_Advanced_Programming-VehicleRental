@@ -10,203 +10,17 @@
 #include <fstream>
 #include <limits>
 
-// Friendship is demonstrated here in the main class.
-// Event logger takes information from car class.
-// Then logs it in a text file.
+// Event logger initialization
 EventLogger logger("event_log.txt");
 
 // Declare the list of cars and users (using pointers)
 std::vector<Customer*> users;
 std::vector<Vehicle*> vehicles;
 std::vector<Car*> car;
-// Function to add default vehicles to the system
-void addDefaultCars() {
-    vehicles.push_back(new Car(1, "Nissan", "Skyline R34 GT-R V-Spec II", 2001, "Blue", 1200.00));
-    vehicles.push_back(new Car(2, "Toyota", "Supra MK4 TT6 Single Turbo", 1997, "White", 700.00));
-    vehicles.push_back(new Car(3, "Honda", "NSX NA1", 1991, "Red", 800.00));
-    vehicles.push_back(new Car(4, "Mazda", "RX7", 2000, "Silver with Fortune Body Kit", 1000.00));
-    vehicles.push_back(new Car(5, "Mitsubishi", "Lancer Evo", 2001, "White", 600.00));
-    vehicles.push_back(new Car(6, "Mazda", "RX7", 2000, "Orange", 1000.00));
-}
-
-void viewVehicles() {
-    // No need to declare a new local vector, just use the global vehicles vector
-    for (auto vehicle : vehicles) {
-        vehicle->displayInfo();  // Calls Car's displayInfo method
-    }
-}
-
-
-void rentCar() {
-    std::cout << "Enter the car ID to rent: ";
-    int carID;
-    std::cin >> carID;
-
-    bool carFound = false;
-    for (auto& car : vehicles) {
-        if (car->getID() == carID && car->getAvailability()) {
-            carFound = true;
-            std::string firstName, lastName, contactDetails;
-            int rentalDuration;
-
-            std::cout << "Enter customer's first name: ";
-            std::cin >> firstName;
-            std::cout << "Enter customer's last name: ";
-            std::cin >> lastName;
-            std::cout << "Enter customer's contact details: ";
-            std::cin.ignore();
-            std::getline(std::cin, contactDetails);
-            std::cout << "Enter rental duration in days: ";
-            std::cin >> rentalDuration;
-
-            Customer* customer = new Customer(firstName, lastName, contactDetails, rentalDuration);
-            customer->displayCustomerInfo();
-            double totalCost = car->calculateRentalCost(rentalDuration);
-            std::cout << "Total rental cost for " << rentalDuration << " days: £" << totalCost << "\n";
-
-            car->setAvailability(false);
-            users.push_back(customer);
-
-            // Log the rental event
-            logger.logCarRental(dynamic_cast<Car&>(*car), firstName + " " + lastName);
-
-
-            std::cout << "\nCar rented successfully!\n";
-            break;
-        }
-    }
-
-    if (!carFound) {
-        std::cout << "Car ID not found or car is not available.\n";
-    }
-}
-
-void addCar() {
-    std::string make, model, color;
-    int year;
-    double costPerDay;
-
-    // Prompt for car details
-    std::cout << "Enter car make: ";
-    std::cin >> make;
-    if (make.empty()) {
-        std::cerr << "Car make cannot be empty!\n";
-        return;
-    }
-
-    std::cout << "Enter car model: ";
-    std::cin >> model;
-    if (model.empty()) {
-        std::cerr << "Car model cannot be empty!\n";
-        return;
-    }
-
-    std::cout << "Enter car year: ";
-    std::cin >> year;
-    if (std::cin.fail() || year < 1886 || year > 2100) {  // Validate the year
-        std::cin.clear(); // Clear the error state
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Discard invalid input
-        std::cerr << "Invalid year entered. Please enter a valid year (e.g., 1998).\n";
-        return;
-    }
-
-    std::cout << "Enter car color: ";
-    std::cin.ignore();  // Ignore leftover newline character
-    std::getline(std::cin, color);
-    if (color.empty()) {
-        std::cerr << "Car color cannot be empty!\n";
-        return;
-    }
-
-    std::cout << "Enter cost per day (£): ";
-    std::cin >> costPerDay;
-    if (std::cin.fail() || costPerDay <= 0) {  // Validate cost per day
-        std::cin.clear(); // Clear the error state
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Discard invalid input
-        std::cerr << "Invalid cost per day. Please enter a positive number.\n";
-        return;
-    }
-
-    // Generate a new ID based on the current number of vehicles
-    int newID = vehicles.size() + 1;
-
-    try {
-        // Exception Handling: Catch any invalid arguments during car creation
-        Car* newCar = new Car(newID, make, model, year, color, costPerDay);
-        vehicles.push_back(newCar);
-
-        // Log the car addition and save to file
-        logger.logCarAddition(*newCar);
-        logger.saveCarToFile(*newCar);
-
-        std::cout << "Car added successfully!\n";
-    }
-    // Catch exceptions and display an error message
-    catch (const std::invalid_argument& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
-    }
-}
-
-// Function to view all users
-void viewUsers() {
-    std::cout << "\n--- Registered Users ---\n";
-    for (const auto& user : users) {
-        user->displayCustomerInfo();
-    }
-}
-
-// Function to handle login
-bool login() {
-    std::string username, password;
-    const std::string correctUsername = "admin";
-    const std::string correctPassword = "password";
-
-    std::cout << "Enter username: ";
-    std::cin >> username;
-    std::cout << "Enter password: ";
-    std::cin >> password;
-
-    if (username == correctUsername && password == correctPassword) {
-        return true;
-    }
-    else {
-        std::cout << "Invalid username or password. Please try again.\n";
-        return false;
-    }
-}
-
-// Define function pointers for the menu
-void (*menuFunctions[])() = { viewVehicles, rentCar, addCar, viewUsers };
-
-// Update the displayMenu function to use function pointers
-void displayMenu() {
-    int choice;
-    do {
-        std::cout << "\n--- Main Menu ---\n";
-        std::cout << "1. View All Cars\n";
-        std::cout << "2. Rent a Car\n";
-        std::cout << "3. Add a Car\n";
-        std::cout << "4. View Users\n";
-        std::cout << "5. Exit\n";
-        std::cout << "Enter your choice: ";
-        std::cin >> choice;
-
-        if (choice >= 1 && choice <= 4) {
-            menuFunctions[choice - 1]();  // Call the corresponding function using the pointer
-        }
-        else if (choice == 5) {
-            std::cout << "Exiting program.\n";
-        }
-        else {
-            std::cout << "Invalid choice, please try again.\n";
-        }
-    } while (choice != 5);
-}
 
 void loadCarsFromFile() {
     std::ifstream carFile("cars.txt");
     if (carFile.is_open()) {
-        std::cout << "Opening cars.txt...\n";
         int id, year;
         std::string make, model, color;
         double costPerDay;
@@ -243,24 +57,240 @@ void loadCarsFromFile() {
     }
 }
 
-// Main function
-int main() {
-    setlocale(LC_ALL, "");  // Set the locale to support special characters
-   // addDefaultCars();  // Add some default cars
+bool login() {
+    std::string username, password;
+    const std::string correctUsername = "admin";
+    const std::string correctPassword = "password";
 
-    if (login()) {
-        addDefaultCars();
-        loadCarsFromFile();  // Load cars from file on startup
-        displayMenu();
+    std::cout << "Enter username: ";
+    std::cin >> username;
+    std::cout << "Enter password: ";
+    std::cin >> password;
+
+    if (username == correctUsername && password == correctPassword) {
+        return true;
     }
+    else {
+        std::cout << "Invalid username or password. Please try again.\n";
+        return false;
+    }
+}
 
-    // Cleanup dynamically allocated memory
+void addDefaultCars() {
+    vehicles.push_back(new Car(1, "Nissan", "Skyline R34 GT-R V-Spec II", 2001, "Blue", 1200.00));
+    vehicles.push_back(new Car(2, "Toyota", "Supra MK4 TT6 Single Turbo", 1997, "White", 700.00));
+    vehicles.push_back(new Car(3, "Honda", "NSX NA1", 1991, "Red", 800.00));
+    vehicles.push_back(new Car(4, "Mazda", "RX7", 2000, "Silver with Fortune Body Kit", 1000.00));
+    vehicles.push_back(new Car(5, "Mitsubishi", "Lancer Evo", 2001, "White", 600.00));
+    vehicles.push_back(new Car(6, "Mazda", "RX7", 2000, "Orange", 1000.00));
+}
+
+void viewVehicles() {
+    for (auto vehicle : vehicles) {
+        vehicle->displayInfo();  // Calls Car's displayInfo method
+    }
+}
+
+void viewUsers() {
+    std::cout << "\n--- Registered Users ---\n";
+    for (const auto& user : users) {
+        user->displayCustomerInfo();
+    }
+}
+
+void rentCar() {
+    std::cout << "Enter the car ID to rent: ";
+    int carID;
+    std::cin >> carID;
+
     for (auto& vehicle : vehicles) {
-        delete vehicle;
+        Car* car = dynamic_cast<Car*>(vehicle);
+        if (car && car->getCarID() == carID && car->getAvailability()) {
+            std::string firstName, lastName, contactDetails;
+            int rentalDuration;
+
+            std::cout << "Enter customer's first name: ";
+            std::cin >> firstName;
+            std::cout << "Enter customer's last name: ";
+            std::cin >> lastName;
+            std::cout << "Enter customer's contact details: ";
+            std::cin.ignore();
+            std::getline(std::cin, contactDetails);
+            std::cout << "Enter rental duration in days: ";
+            std::cin >> rentalDuration;
+
+            Customer* customer = new Customer(firstName, lastName, contactDetails, rentalDuration);
+            users.push_back(customer);
+
+            double totalCost = car->calculateRentalCost(rentalDuration);
+            std::cout << "Total rental cost for " << rentalDuration << " days: £" << totalCost << "\n";
+
+            car->setAvailability(false);
+            EventLogger::log("Rented car: " + car->getMake() + " " + car->getModel() + " to " + firstName + " " + lastName);
+            std::cout << "Car rented successfully!\n";
+            return;
+        }
     }
-    for (auto& user : users) {
-        delete user;
+    std::cout << "Car with ID " << carID << " not available for rent.\n";
+}
+
+void addCar() {
+    std::string make, model, color;
+    int year;
+    double costPerDay;
+
+    std::cout << "Enter car make: ";
+    std::cin >> make;
+    if (make.empty()) {
+        std::cerr << "Car make cannot be empty!\n";
+        return;
     }
+
+    std::cout << "Enter car model: ";
+    std::cin >> model;
+    if (model.empty()) {
+        std::cerr << "Car model cannot be empty!\n";
+        return;
+    }
+
+    std::cout << "Enter car year: ";
+    std::cin >> year;
+    if (std::cin.fail() || year < 1886 || year > 2100) {
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cerr << "Invalid year entered. Please enter a valid year (e.g., 1998).\n";
+        return;
+    }
+
+    std::cout << "Enter car color: ";
+    std::cin.ignore();
+    std::getline(std::cin, color);
+    if (color.empty()) {
+        std::cerr << "Car color cannot be empty!\n";
+        return;
+    }
+
+    std::cout << "Enter cost per day (£): ";
+    std::cin >> costPerDay;
+    if (std::cin.fail() || costPerDay <= 0) {
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cerr << "Invalid cost per day. Please enter a positive number.\n";
+        return;
+    }
+
+    int newID = vehicles.size() + 1;
+
+    try {
+        Car* newCar = new Car(newID, make, model, year, color, costPerDay);
+        vehicles.push_back(newCar);
+
+        EventLogger::log("Added car: " + newCar->getMake() + " " + newCar->getModel());
+
+        // Convert vector of Vehicle* to vector of Car objects (by dereferencing the pointers)
+        std::vector<Car> cars;
+        for (auto& vehicle : vehicles) {
+            Car* car = dynamic_cast<Car*>(vehicle);
+            if (car) {
+                cars.push_back(*car);  // Dereference pointer to get the object
+            }
+        }
+
+        // Save the cars to file after adding
+        Car::saveCarsToFile(cars, "cars.txt");
+
+        std::cout << "Car added successfully!\n";
+    }
+    catch (const std::invalid_argument& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
+}
+
+void deleteCar() {
+    std::cout << "Enter the car ID to delete: ";
+    int carID;
+    std::cin >> carID;
+
+    for (auto it = vehicles.begin(); it != vehicles.end(); ++it) {
+        Car* car = dynamic_cast<Car*>(*it);
+        if (car && car->getCarID() == carID) {
+            EventLogger::log("Deleted car: " + car->getMake() + " " + car->getModel());
+            delete car;
+            vehicles.erase(it);
+
+            // Convert vector of Vehicle* to vector of Car objects (by dereferencing the pointers)
+            std::vector<Car> cars;
+            for (auto& vehicle : vehicles) {
+                Car* car = dynamic_cast<Car*>(vehicle);
+                if (car) {
+                    cars.push_back(*car);  // Dereference pointer to get the object
+                }
+            }
+
+            // Save the remaining cars to file after deletion
+            Car::saveCarsToFile(cars, "cars.txt");
+            std::cout << "Car deleted successfully.\n";
+            return;
+        }
+    }
+    std::cout << "Car with ID " << carID << " not found.\n";
+}
+
+
+void displayMenu() {
+    int choice;
+    do {
+        std::cout << "\n--- Main Menu ---\n";
+        std::cout << "1. View All Cars\n";
+        std::cout << "2. Rent a Car\n";
+        std::cout << "3. Add a Car\n";
+        std::cout << "4. Delete a Car\n";  // Add delete option here
+        std::cout << "5. View Users\n";
+        std::cout << "6. Exit\n";
+        std::cout << "Enter your choice: ";
+        std::cin >> choice;
+
+        if (choice >= 1 && choice <= 5) {
+            switch (choice) {
+            case 1: viewVehicles(); break;
+            case 2: rentCar(); break;
+            case 3: addCar(); break;
+            case 4: deleteCar(); break;  // Call deleteCar here
+            case 5: viewUsers(); break;
+            }
+        }
+        else if (choice == 6) {
+            std::cout << "Exiting the program.\n";
+            break;
+        }
+        else {
+            std::cout << "Invalid choice. Please try again.\n";
+        }
+    } while (true);
+}
+
+int main() {
+    if (!login()) {
+        std::cerr << "Login failed! Exiting...\n";
+        return 1;
+    }
+
+    loadCarsFromFile();  // Load cars from file on startup
+
+    // Check if cars are empty before adding default cars
+    if (vehicles.empty()) {
+        addDefaultCars();    // Add default cars only if no cars were loaded from the file
+    }
+
+    // Set the locale to British English
+    std::setlocale(LC_ALL, "en_GB.UTF-8");
+
+
+    displayMenu();
+
+    // Cleanup: Delete dynamically allocated memory
+    for (auto user : users) delete user;
+    for (auto vehicle : vehicles) delete vehicle;
 
     return 0;
 }

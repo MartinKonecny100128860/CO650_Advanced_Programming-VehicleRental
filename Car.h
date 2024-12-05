@@ -2,27 +2,42 @@
 #define CAR_H
 
 #include "Vehicle.h"
+#include <vector>
+#include <string>
+#include <fstream>
+#include <stdexcept>
+#include <sstream>
 
 class Car : public Vehicle {
+
 private:
-    bool available;
+    bool available; // Availability of the car
+    int id;         // Unique car ID
 
 public:
-    // Constructor for the Car class
+    // Constructor
     Car(int id, const std::string& make, const std::string& model, int year, const std::string& color, double costPerDay);
 
-    // Getter and Setter for availability
-    bool getAvailability() const;
+    // Setters and Getters
     void setAvailability(bool availability);
+    bool getAvailability() const;
+    std::string getMake() const;
+    std::string getModel() const;
+    int getYear() const { return year; }
+    std::string getColor() const { return color; }
+    int getCarID() const { return id; }  // Add this function
 
-    // Overridden method for displaying information about the car
-    void displayCarInfo(bool includeCostAndAvailability) const override;
+    // Method to calculate rental cost
+    double calculateRentalCost(int days) const;
 
-    // Overridden method for displaying more detailed info about the car
-    void displayInfo() const override;  // Polymorphic behavior
+    // File operations
+    static void saveCarsToFile(const std::vector<Car>& cars, const std::string& filename);
+    static void loadCarsFromFile(std::vector<Car>& cars, const std::string& filename);
 
-    // Custom method to calculate rental cost
-    double calculateRentalCost(int rentalDuration);
+    // Overriding displayInfo from Vehicle
+    void displayInfo() const override;
+
 };
 
 #endif
+

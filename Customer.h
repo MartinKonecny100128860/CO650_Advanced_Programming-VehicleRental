@@ -16,6 +16,11 @@ public:
 
     // Display customer details
     void displayCustomerInfo() const;
+
+    // Add these to Customer.h
+    std::string getFirstName() const { return firstName; }
+    std::string getLastName() const { return lastName; }
+
 };
 
 #endif

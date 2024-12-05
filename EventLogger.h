@@ -1,20 +1,33 @@
 #ifndef EVENTLOGGER_H
 #define EVENTLOGGER_H
 
-#include <string>
+#include <iostream>
 #include <fstream>
-#include "Car.h"
+#include <string>
+#include "car.h"
+#include "customer.h"
+
 
 class EventLogger {
 private:
-    std::string logFileName;
+    static std::ofstream logFile;
 
 public:
-    EventLogger(const std::string& fileName);
+    // EventLogger.h
+    EventLogger(const std::string& filename);
 
-    void logCarRental(const Car& car, const std::string& customerName);
-    void logCarAddition(const Car& car);
-    void saveCarToFile(const Car& car);
+    // Static function for initializing the log file
+    static void initialize(const std::string& filename);
+
+    // Static function to log messages
+    static void log(const std::string& message);
+
+    // Static function to close the log file
+    static void close();
+
+    void logCarAddition(const Car& car); // Logs when a car is added
+    void saveCarToFile(const Car& car); // Saves car details to a file
+    void logCarRental(const Car& car, const Customer& customer); // Logs car rentals
 };
 
-#endif
+#endif // EVENTLOGGER_H
