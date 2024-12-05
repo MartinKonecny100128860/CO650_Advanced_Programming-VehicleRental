@@ -36,6 +36,7 @@ void Car::displayInfo() const {
         << ", Available: " << (available ? "Yes" : "No") << "\n";
 }
 
+
 // Static file operations
 void Car::saveCarsToFile(const std::vector<Car>& cars, const std::string& filename) {
     std::ofstream file(filename);
