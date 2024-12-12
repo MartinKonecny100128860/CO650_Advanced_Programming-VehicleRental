@@ -61,9 +61,13 @@ void saveUsersToFile() {
     std::ofstream userFile("users.txt");
     if (userFile.is_open()) {
         for (const auto& user : users) {
-            userFile << user->getFirstName() << "," << user->getLastName() << "," << user->getContactDetails() << ",";
-            userFile << user->getRentalDuration() << "," << user->getRentedCarID() << ",";
-            userFile << user->getRentedCarMake() << "," << user->getRentedCarModel() << "\n";
+            userFile << user->getFirstName() << ","
+                << user->getLastName() << ","
+                << user->getContactDetails() << ","
+                << user->getRentalDuration() << ","
+                << user->getRentedCarID() << ","
+                << user->getRentedCarMake() << ","
+                << user->getRentedCarModel() << "\n";
         }
         userFile.close();
     }
@@ -82,15 +86,17 @@ void loadUsersFromFile() {
             std::getline(userFile, lastName, ',');
             std::getline(userFile, contactDetails, ',');
             userFile >> rentalDuration;
-            userFile.ignore();
+            userFile.ignore(); // Skip the comma
             userFile >> carID;
-            userFile.ignore();
+            userFile.ignore(); // Skip the comma
             std::getline(userFile, make, ',');
             std::getline(userFile, model);
 
+            // Initialize a Customer object with the loaded data
             Customer* loadedUser = new Customer(firstName, lastName, contactDetails, rentalDuration, carID, make, model);
             users.push_back(loadedUser);
 
+            // Mark the corresponding car as rented
             for (auto& vehicle : vehicles) {
                 Car* car = dynamic_cast<Car*>(vehicle);
                 if (car && car->getCarID() == carID) {
@@ -101,7 +107,11 @@ void loadUsersFromFile() {
         }
         userFile.close();
     }
+    else {
+        std::cerr << "Error loading users from file.\n";
+    }
 }
+
 
 bool login() {
     std::string username, password;
