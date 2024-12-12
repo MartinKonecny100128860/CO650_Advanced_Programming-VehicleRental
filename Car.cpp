@@ -1,6 +1,7 @@
 ﻿#include "Car.h"
 #include <iostream>
 #include <locale>
+#include <iomanip>
 
 // Constructor definition
 Car::Car(int id, const std::string& make, const std::string& model, int year, const std::string& color, double costPerDay)
@@ -29,11 +30,36 @@ double Car::calculateRentalCost(int days) const {
     return days * costPerDay;
 }
 
-// Display car details
 void Car::displayInfo() const {
-    std::cout << "Car ID: " << id << ", Make: " << make << ", Model: " << model
-        << ", Year: " << year << ", Color: " << color << ", Cost per day: $" << costPerDay << ".00"
-        << ", Available: " << (available ? "Yes" : "No") << "\n";
+    // Print table header only once
+    static bool headerPrinted = false;
+    if (!headerPrinted) {
+        std::cout << std::setw(8) << std::left << "Car ID"
+            << std::setw(15) << std::left << "Make"
+            << std::setw(30) << std::left << "Model"
+            << std::setw(8) << std::left << "Year"
+            << std::setw(30) << std::left << "Color"
+            << std::setw(20) << std::right << "Cost per day"   // Right-aligned header for Cost per day
+            << std::setw(15) << std::right << "Available"       // Right-aligned header for Available
+            << std::endl;
+
+        // Print table separator line: updated length to match the full column widths
+        std::cout << std::string(8 + 15 + 30 + 8 + 30 + 20 + 15, '-') << std::endl;
+
+        headerPrinted = true; // Mark header as printed
+    }
+
+    // Print car details with appropriate formatting
+    std::cout << std::setw(8) << std::left << id
+        << std::setw(15) << std::left << make
+        << std::setw(30) << std::left << model
+        << std::setw(8) << std::left << year
+        << std::setw(30) << std::left << color
+        << std::setw(10) << std::right << "$" << std::fixed << std::setprecision(2) << costPerDay
+        << std::setw(15) << std::right << (available ? "Yes" : "No") << std::endl;
+
+    // Print footer separator line: same length as the header separator
+    std::cout << std::string(8 + 15 + 30 + 8 + 30 + 20 + 15, '-') << std::endl;
 }
 
 

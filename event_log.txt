@@ -1,15 +1,5 @@
-Car Rented: Nissan Skyline R34 GT-R V-Spec II 2001 Color: Blue by Pedro Gonzalez. Cost Per Day: £1200
-Car Rented: Nissan Skyline R34 GT-R V-Spec II 2001 Color: Blue by fds gfd. Cost Per Day: £1200
-Car Rented: Nissan Skyline R34 GT-R V-Spec II 2001 Color: Blue by fvdcs vfdcs. Cost Per Day: £1200
-Car Rented: Nissan Skyline R34 GT-R V-Spec II 2001 Color: Blue by dfvg sdf. Cost Per Day: £1200
-Car Rented: Nissan Skyline R34 GT-R V-Spec II 2001 Color: Blue by dsfgb sdfvg. Cost Per Day: £1200
-Rented car: Toyota Corolla to GHOST RILEY
-Added car: Porsche 911
-Deleted car: Toyota Corolla
-Added car: Porsche 911
-Deleted car: Porsche 911
-Added car: Porsche 911
-Deleted car: Porsche 911
-Added car: Toyota Corolla
-Rented car: Toyota Corolla to martinez jose
-Deleted car: Toyota Corolla
+
+Added car: Toyota MR2
+Rented car: Toyota MR2 to Jose Menendez
+Rented car: Toyota MR2 to Martinez Jose
+Rented car: Toyota MR2 to Martinez Pedro

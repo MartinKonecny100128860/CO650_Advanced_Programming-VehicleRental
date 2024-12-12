@@ -82,7 +82,7 @@ void addDefaultCars() {
     vehicles.push_back(new Car(3, "Honda", "NSX NA1", 1991, "Red", 800.00));
     vehicles.push_back(new Car(4, "Mazda", "RX7", 2000, "Silver with Fortune Body Kit", 1000.00));
     vehicles.push_back(new Car(5, "Mitsubishi", "Lancer Evo", 2001, "White", 600.00));
-    vehicles.push_back(new Car(6, "Mazda", "RX7", 2000, "Orange", 1000.00));
+    vehicles.push_back(new Car(6, "Nissan", "200SX", 1996, "Orange", 1000.00));
 }
 
 void viewVehicles() {
@@ -119,7 +119,9 @@ void rentCar() {
             std::cout << "Enter rental duration in days: ";
             std::cin >> rentalDuration;
 
-            Customer* customer = new Customer(firstName, lastName, contactDetails, rentalDuration);
+            // Pass car details to the Customer constructor
+            Customer* customer = new Customer(firstName, lastName, contactDetails, rentalDuration,
+                car->getCarID(), car->getMake(), car->getModel());
             users.push_back(customer);
 
             double totalCost = car->calculateRentalCost(rentalDuration);
@@ -133,6 +135,7 @@ void rentCar() {
     }
     std::cout << "Car with ID " << carID << " not available for rent.\n";
 }
+
 
 void addCar() {
     std::string make, model, color;

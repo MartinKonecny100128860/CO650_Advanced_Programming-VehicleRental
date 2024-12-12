@@ -3,4 +3,5 @@
 3,Honda,NSX NA1,1991,Red,800
 4,Mazda,RX7,2000,Silver with Fortune Body Kit,1000
 5,Mitsubishi,Lancer Evo,2001,White,600
-6,Mazda,RX7,2000,Orange,1000
+6,Nissan,200SX,1996,Orange,1000
+7,Toyota,MR2,1989,Black,250
