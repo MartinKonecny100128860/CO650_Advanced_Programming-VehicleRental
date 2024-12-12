@@ -15,6 +15,7 @@ private:
 public:
     // EventLogger.h
     EventLogger(const std::string& filename);
+    void saveCustomerDetails(const Customer& customer);  // Declare the function
 
     // Static function for initializing the log file
     static void initialize(const std::string& filename);

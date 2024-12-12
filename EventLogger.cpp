@@ -34,7 +34,9 @@ void EventLogger::saveCarToFile(const Car& car) {
 void EventLogger::logCarRental(const Car& car, const Customer& customer) {
     log("Rented car: " + car.getMake() + " " + car.getModel() +
         " to " + customer.getFirstName() + " " + customer.getLastName());
+    saveCustomerDetails(customer);  // Log customer details
 }
+
 
 // Log a message
 void EventLogger::log(const std::string& message) {
@@ -49,3 +51,15 @@ void EventLogger::close() {
         logFile.close();
     }
 }
+
+
+void EventLogger::saveCustomerDetails(const Customer& customer) {
+    std::ofstream outFile("customer_rentals.txt", std::ios::app);
+    if (outFile.is_open()) {
+        outFile << customer.getFirstName() << " " << customer.getLastName() << ","
+            << customer.getContactDetails() << ","
+            << customer.getRentalDuration() << "\n";  // Save customer details
+        outFile.close();
+    }
+}
+

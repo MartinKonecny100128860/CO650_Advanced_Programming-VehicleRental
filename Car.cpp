@@ -5,7 +5,7 @@
 
 // Constructor definition
 Car::Car(int id, const std::string& make, const std::string& model, int year, const std::string& color, double costPerDay)
-    : Vehicle(make, model, year, costPerDay), id(id), available(true) {
+    : Vehicle(make, model, year, costPerDay), id(id), available(true), isRented(false) {
     this->color = color;  // Set the color after calling the base class constructor
 }
 
@@ -16,6 +16,14 @@ void Car::setAvailability(bool availability) {
 
 bool Car::getAvailability() const {
     return available;
+}
+
+void Car::setIsRented(bool rented) {
+    isRented = rented;
+}
+
+bool Car::getIsRented() const {
+    return isRented;
 }
 
 std::string Car::getMake() const {
@@ -62,14 +70,14 @@ void Car::displayInfo() const {
     std::cout << std::string(8 + 15 + 30 + 8 + 30 + 20 + 15, '-') << std::endl;
 }
 
-
 // Static file operations
 void Car::saveCarsToFile(const std::vector<Car>& cars, const std::string& filename) {
     std::ofstream file(filename);
     if (file.is_open()) {
         for (const Car& car : cars) {
             file << car.getCarID() << "," << car.getMake() << "," << car.getModel() << ","
-                << car.getYear() << "," << car.getColor() << "," << car.calculateRentalCost(1) << "\n";
+                << car.getYear() << "," << car.getColor() << "," << car.calculateRentalCost(1) << ","
+                << (car.getIsRented() ? "rented" : "available") << "\n"; // Save rental status
         }
         file.close();
     }
@@ -82,7 +90,7 @@ void Car::loadCarsFromFile(std::vector<Car>& cars, const std::string& filename) 
     std::ifstream file(filename);
     if (file.is_open()) {
         int id, year;
-        std::string make, model, color;
+        std::string make, model, color, rentedStatus;
         double costPerDay;
 
         while (file >> id) {
@@ -93,7 +101,11 @@ void Car::loadCarsFromFile(std::vector<Car>& cars, const std::string& filename) 
             file.ignore();
             std::getline(file, color, ',');
             file >> costPerDay;
-            cars.push_back(Car(id, make, model, year, color, costPerDay));
+            std::getline(file, rentedStatus); // Load rental status
+            bool isRented = (rentedStatus == "rented");
+            Car car(id, make, model, year, color, costPerDay);
+            car.setIsRented(isRented);
+            cars.push_back(car);
         }
         file.close();
     }
@@ -102,4 +114,32 @@ void Car::loadCarsFromFile(std::vector<Car>& cars, const std::string& filename) 
     }
 }
 
+// Static function to save rental data
+void Car::saveRentalData(const std::vector<Car>& cars, const std::string& filename) {
+    std::ofstream file(filename);
+    if (file.is_open()) {
+        for (const Car& car : cars) {
+            if (car.getIsRented()) {
+                file << car.getCarID() << "," << car.getMake() << "," << car.getModel() << "\n"; // Save rented car details
+            }
+        }
+        file.close();
+    }
+}
 
+// Static function to load rental data
+void Car::loadRentalData(std::vector<Car>& cars, const std::string& filename) {
+    std::ifstream file(filename);
+    if (file.is_open()) {
+        int carID;
+        while (file >> carID) {
+            file.ignore();
+            for (Car& car : cars) {
+                if (car.getCarID() == carID) {
+                    car.setIsRented(true);
+                }
+            }
+        }
+        file.close();
+    }
+}

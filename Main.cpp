@@ -57,6 +57,52 @@ void loadCarsFromFile() {
     }
 }
 
+void saveUsersToFile() {
+    std::ofstream userFile("users.txt");
+    if (userFile.is_open()) {
+        for (const auto& user : users) {
+            userFile << user->getFirstName() << "," << user->getLastName() << "," << user->getContactDetails() << ",";
+            userFile << user->getRentalDuration() << "," << user->getRentedCarID() << ",";
+            userFile << user->getRentedCarMake() << "," << user->getRentedCarModel() << "\n";
+        }
+        userFile.close();
+    }
+    else {
+        std::cerr << "Error saving users to file.\n";
+    }
+}
+
+void loadUsersFromFile() {
+    std::ifstream userFile("users.txt");
+    if (userFile.is_open()) {
+        std::string firstName, lastName, contactDetails, make, model;
+        int rentalDuration, carID;
+
+        while (std::getline(userFile, firstName, ',')) {
+            std::getline(userFile, lastName, ',');
+            std::getline(userFile, contactDetails, ',');
+            userFile >> rentalDuration;
+            userFile.ignore();
+            userFile >> carID;
+            userFile.ignore();
+            std::getline(userFile, make, ',');
+            std::getline(userFile, model);
+
+            Customer* loadedUser = new Customer(firstName, lastName, contactDetails, rentalDuration, carID, make, model);
+            users.push_back(loadedUser);
+
+            for (auto& vehicle : vehicles) {
+                Car* car = dynamic_cast<Car*>(vehicle);
+                if (car && car->getCarID() == carID) {
+                    car->setAvailability(false);
+                    break;
+                }
+            }
+        }
+        userFile.close();
+    }
+}
+
 bool login() {
     std::string username, password;
     const std::string correctUsername = "admin";
@@ -119,16 +165,16 @@ void rentCar() {
             std::cout << "Enter rental duration in days: ";
             std::cin >> rentalDuration;
 
-            // Pass car details to the Customer constructor
             Customer* customer = new Customer(firstName, lastName, contactDetails, rentalDuration,
                 car->getCarID(), car->getMake(), car->getModel());
             users.push_back(customer);
 
             double totalCost = car->calculateRentalCost(rentalDuration);
-            std::cout << "Total rental cost for " << rentalDuration << " days: £" << totalCost << "\n";
+            std::cout << "Total rental cost for " << rentalDuration << " days: \xC2\xA3" << totalCost << "\n";
 
             car->setAvailability(false);
             EventLogger::log("Rented car: " + car->getMake() + " " + car->getModel() + " to " + firstName + " " + lastName);
+            saveUsersToFile();
             std::cout << "Car rented successfully!\n";
             return;
         }
@@ -279,6 +325,7 @@ int main() {
     }
 
     loadCarsFromFile();  // Load cars from file on startup
+    loadUsersFromFile();
 
     // Check if cars are empty before adding default cars
     if (vehicles.empty()) {

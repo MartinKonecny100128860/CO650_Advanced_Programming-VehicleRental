@@ -7,6 +7,19 @@ Customer::Customer(const std::string& firstName, const std::string& lastName, co
     : firstName(firstName), lastName(lastName), contactDetails(contactDetails), rentalDuration(rentalDuration),
     carID(carID), carMake(carMake), carModel(carModel) {}
 
+// Getter methods for rented car details
+int Customer::getRentedCarID() const {
+    return rentedCarID;
+}
+
+std::string Customer::getRentedCarMake() const {
+    return rentedCarMake;
+}
+
+std::string Customer::getRentedCarModel() const {
+    return rentedCarModel;
+}
+
 // Method to display customer details, including booked car details
 void Customer::displayCustomerInfo() const {
     std::cout << "Car ID: " << carID << "\n"
