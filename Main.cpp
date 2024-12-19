@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <fstream>
 #include <limits>
+#include <iomanip>
 
 // Event logger initialization
 EventLogger logger("event_log.txt");
@@ -111,7 +112,6 @@ void loadUsersFromFile() {
         std::cerr << "Error loading users from file.\n";
     }
 }
-
 
 bool login() {
     std::string username, password;
@@ -347,14 +347,17 @@ void displayMenu() {
     };
 
     do {
-        std::cout << "\n--- Main Menu ---\n";
-        std::cout << "1. View All Cars\n";
-        std::cout << "2. Rent a Car\n";
-        std::cout << "3. Add a Car\n";
-        std::cout << "4. Delete a Car\n";  // Delete option
-        std::cout << "5. View Users\n";
-        std::cout << "6. Return a Car\n";  // Return car option
-        std::cout << "7. Exit\n";
+        std::cout << "\n=====================================\n";
+        std::cout << "          --- Main Menu ---          \n";
+        std::cout << "=====================================\n";
+        std::cout << "  1. View All Cars                 \n";
+        std::cout << "  2. Rent a Car                    \n";
+        std::cout << "  3. Add a Car                     \n";
+        std::cout << "  4. Delete a Car                  \n";  // Delete option
+        std::cout << "  5. View Users                    \n";
+        std::cout << "  6. Return a Car                  \n";  // Return car option
+        std::cout << "  7. Exit                          \n";
+        std::cout << "=====================================\n";
         std::cout << "Enter your choice: ";
         std::cin >> choice;
 
@@ -373,6 +376,9 @@ void displayMenu() {
 }
 
 int main() {
+
+    std::cout << "Welcome to the Vehicle Rental System!\n";
+
     if (!login()) {
         std::cerr << "Login failed! Exiting...\n";
         return 1;
