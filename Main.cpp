@@ -296,29 +296,73 @@ void deleteCar() {
 }
 
 
+// Return car function
+void returnCar() {
+    std::cout << "Enter the car ID to return: ";
+    int carID;
+    std::cin >> carID;
+
+    // Find the customer who rented this car
+    auto customerIt = std::find_if(users.begin(), users.end(), [carID](Customer* user) {
+        return user->getRentedCarID() == carID;
+        });
+
+    if (customerIt != users.end()) {
+        // Mark the car as available
+        for (auto& vehicle : vehicles) {
+            Car* car = dynamic_cast<Car*>(vehicle);
+            if (car && car->getCarID() == carID) {
+                car->setAvailability(true);
+                std::cout << "Car with ID " << carID << " has been returned and is available to be rented again.\n";
+                break;
+            }
+        }
+
+        // Remove the customer from the users vector
+        users.erase(customerIt);
+        std::cout << "Customer and rental information removed from records.\n";
+
+        // Save the updated users to file
+        saveUsersToFile();
+        EventLogger::log("Returned car with ID: " + std::to_string(carID));
+    }
+    else {
+        std::cout << "No rental found for car ID " << carID << ".\n";
+    }
+}
+
+using MenuAction = void(*)();
+
 void displayMenu() {
     int choice;
+
+    // Array of function pointers, each corresponding to a menu option
+    MenuAction menuActions[] = {
+        viewVehicles,  // 1. View All Cars
+        rentCar,       // 2. Rent a Car
+        addCar,        // 3. Add a Car
+        deleteCar,     // 4. Delete a Car
+        viewUsers,     // 5. View Users
+        returnCar      // 6. Return a Car
+    };
+
     do {
         std::cout << "\n--- Main Menu ---\n";
         std::cout << "1. View All Cars\n";
         std::cout << "2. Rent a Car\n";
         std::cout << "3. Add a Car\n";
-        std::cout << "4. Delete a Car\n";  // Add delete option here
+        std::cout << "4. Delete a Car\n";  // Delete option
         std::cout << "5. View Users\n";
-        std::cout << "6. Exit\n";
+        std::cout << "6. Return a Car\n";  // Return car option
+        std::cout << "7. Exit\n";
         std::cout << "Enter your choice: ";
         std::cin >> choice;
 
-        if (choice >= 1 && choice <= 5) {
-            switch (choice) {
-            case 1: viewVehicles(); break;
-            case 2: rentCar(); break;
-            case 3: addCar(); break;
-            case 4: deleteCar(); break;  // Call deleteCar here
-            case 5: viewUsers(); break;
-            }
+        if (choice >= 1 && choice <= 6) {
+            // Call the appropriate function using function pointers
+            menuActions[choice - 1]();  // Call the function based on the user's choice
         }
-        else if (choice == 6) {
+        else if (choice == 7) {
             std::cout << "Exiting the program.\n";
             break;
         }
@@ -344,7 +388,6 @@ int main() {
 
     // Set the locale to British English
     std::setlocale(LC_ALL, "en_GB.UTF-8");
-
 
     displayMenu();
 

@@ -17,3 +17,8 @@ Rented car: Toyota MR2 to edfvg wedrftg
 Rented car: Toyota MR2 to MARTINEZ JOSE
 Rented car: Toyota MR2 to edwrftg wqedfg
 Rented car: Toyota MR2 to Martin Koecny
+Returned car with ID: 7
+Rented car: Toyota MR2 to Martin Konichiwa
+Returned car with ID: 7
+Rented car: Nissan Skyline R34 GT-R V-Spec II to Marquez Hernandez
+Returned car with ID: 1
