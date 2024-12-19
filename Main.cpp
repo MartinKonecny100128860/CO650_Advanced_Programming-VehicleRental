@@ -176,7 +176,7 @@ void rentCar() {
             users.push_back(customer);
 
             double totalCost = car->calculateRentalCost(rentalDuration);
-            std::cout << "Total rental cost for " << rentalDuration << " days: \xC2\xA3" << totalCost << "\n";
+            std::cout << "Total rental cost for " << rentalDuration << " days: $" << totalCost << "\n";
 
             car->setAvailability(false);
             EventLogger::log("Rented car: " + car->getMake() + " " + car->getModel() + " to " + firstName + " " + lastName);
@@ -222,13 +222,13 @@ void addCar() {
     std::cin >> year;
     if (std::cin.fail() || year < 1886 || year > 2100) {
         std::cin.clear();
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Correct usage
+        std::cin.ignore(10000, '\n');  // Ignore up to 10,000 characters
         std::cerr << "Invalid year entered. Please enter a valid year (e.g., 1998).\n";
         return;
     }
 
     std::cout << "Enter car color: ";
-    std::cin.ignore();  // Clear the input buffer before using getline
+    std::cin.ignore();  // Clear the leftover newline
     std::getline(std::cin, color);
     if (color.empty()) {
         std::cerr << "Car color cannot be empty!\n";
@@ -239,7 +239,7 @@ void addCar() {
     std::cin >> costPerDay;
     if (std::cin.fail() || costPerDay <= 0) {
         std::cin.clear();
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Correct usage
+        std::cin.ignore(10000, '\n');  // Ignore up to 10,000 characters
         std::cerr << "Invalid cost per day. Please enter a positive number.\n";
         return;
     }
@@ -303,30 +303,43 @@ void returnCar() {
     int carID;
     std::cin >> carID;
 
+    // Find the customer who rented the car
     auto customerIt = std::find_if(users.begin(), users.end(), [carID](Customer* user) {
         return user->getRentedCarID() == carID;
         });
 
     if (customerIt != users.end()) {
+        // Retrieve the customer's first name and last name
+        std::string firstName = (*customerIt)->getFirstName();
+        std::string lastName = (*customerIt)->getLastName();
+
+        // Concatenate first name and last name to get the full customer name
+        std::string customerName = firstName + " " + lastName;
+
+        // Find and return the car
         for (auto& vehicle : vehicles) {
             Car* car = dynamic_cast<Car*>(vehicle);
             if (car && car->getCarID() == carID) {
-                car->setAvailability(true);
+                car->setAvailability(true);  // Mark car as available
                 std::cout << "Car with ID " << carID << " has been returned and is available to be rented again.\n";
                 break;
             }
         }
 
+        // Remove the customer and rental information
         users.erase(customerIt);
-        std::cout << "Customer and rental information removed from records.\n";
+        std::cout << "Customer " << customerName << " and rental information removed from records.\n";
 
+        // Save updated records
         saveUsersToFile();
-        EventLogger::log("Returned car with ID: " + std::to_string(carID));
 
-        // Send message to the server
+        // Log the return event with customer name
+        EventLogger::log("Returned car with ID: " + std::to_string(carID) + " by customer: " + customerName);
+
+        // Send message to the server with customer name and car ID
         ServerLogger logger;
         if (logger.connectToServer("127.0.0.1", 5000)) {  // Connect to the server (use your server's IP and port)
-            logger.log("Car ID " + std::to_string(carID) + " returned");
+            logger.log("Car ID " + std::to_string(carID) + " returned by " + customerName);
         }
     }
     else {
