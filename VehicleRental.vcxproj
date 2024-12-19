@@ -22,9 +22,8 @@
     <ClCompile Include="Car.cpp" />
     <ClCompile Include="Customer.cpp" />
     <ClCompile Include="EventLogger.cpp" />
-    <ClCompile Include="InvalidCarDataException.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="User.cpp" />
+    <ClCompile Include="ServerLogger.cpp" />
     <ClCompile Include="Vehicle.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -32,8 +31,11 @@
     <ClInclude Include="Customer.h" />
     <ClInclude Include="EventLogger.h" />
     <ClInclude Include="InvalidCarDataException.h" />
-    <ClInclude Include="User.h" />
+    <ClInclude Include="ServerLogger.h" />
     <ClInclude Include="Vehicle.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

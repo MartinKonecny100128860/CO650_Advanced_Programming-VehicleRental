@@ -5,16 +5,15 @@
 #include "Car.h"
 #include "Customer.h"
 #include "EventLogger.h"
+#include "ServerLogger.h"
 #include <stdexcept>
 #include <algorithm>
 #include <fstream>
 #include <limits>
 #include <iomanip>
 
-// Event logger initialization
 EventLogger logger("event_log.txt");
 
-// Declare the list of cars and users (using pointers)
 std::vector<Customer*> users;
 std::vector<Vehicle*> vehicles;
 std::vector<Car*> car;
@@ -27,15 +26,14 @@ void loadCarsFromFile() {
         double costPerDay;
 
         while (carFile >> id) {
-            carFile.ignore();  // Skip the comma before the make
-            std::getline(carFile, make, ',');  // Read the car make
-            std::getline(carFile, model, ',');  // Read the car model
+            carFile.ignore();  
+            std::getline(carFile, make, ','); 
+            std::getline(carFile, model, ',');
             carFile >> year;
-            carFile.ignore();  // Ignore the comma before color
-            std::getline(carFile, color, ',');  // Read the car color
+            carFile.ignore();
+            std::getline(carFile, color, ',');
             carFile >> costPerDay;
 
-            // Exception Handling: Throw if costPerDay or year is invalid
             try {
                 if (costPerDay <= 0) {
                     throw std::invalid_argument("Invalid cost per day in file.");
@@ -87,17 +85,15 @@ void loadUsersFromFile() {
             std::getline(userFile, lastName, ',');
             std::getline(userFile, contactDetails, ',');
             userFile >> rentalDuration;
-            userFile.ignore(); // Skip the comma
+            userFile.ignore();
             userFile >> carID;
-            userFile.ignore(); // Skip the comma
+            userFile.ignore();
             std::getline(userFile, make, ',');
             std::getline(userFile, model);
 
-            // Initialize a Customer object with the loaded data
             Customer* loadedUser = new Customer(firstName, lastName, contactDetails, rentalDuration, carID, make, model);
             users.push_back(loadedUser);
 
-            // Mark the corresponding car as rented
             for (auto& vehicle : vehicles) {
                 Car* car = dynamic_cast<Car*>(vehicle);
                 if (car && car->getCarID() == carID) {
@@ -143,7 +139,7 @@ void addDefaultCars() {
 
 void viewVehicles() {
     for (auto vehicle : vehicles) {
-        vehicle->displayInfo();  // Calls Car's displayInfo method
+        vehicle->displayInfo();
     }
 }
 
@@ -186,12 +182,22 @@ void rentCar() {
             EventLogger::log("Rented car: " + car->getMake() + " " + car->getModel() + " to " + firstName + " " + lastName);
             saveUsersToFile();
             std::cout << "Car rented successfully!\n";
+
+            // Send message to the server
+            ServerLogger logger;
+            if (logger.connectToServer("127.0.0.1", 5000)) {  // Connect to the server (use your server's IP and port)
+                std::string message = "Car ID " + std::to_string(carID) + " rented to " + firstName + " " + lastName;
+                logger.log(message);  // Log the rental message to the server
+            }
+
             return;
         }
     }
     std::cout << "Car with ID " << carID << " not available for rent.\n";
 }
 
+#include <iostream>
+#include <limits> // Ensure this header is included for std::numeric_limits
 
 void addCar() {
     std::string make, model, color;
@@ -216,13 +222,13 @@ void addCar() {
     std::cin >> year;
     if (std::cin.fail() || year < 1886 || year > 2100) {
         std::cin.clear();
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Correct usage
         std::cerr << "Invalid year entered. Please enter a valid year (e.g., 1998).\n";
         return;
     }
 
     std::cout << "Enter car color: ";
-    std::cin.ignore();
+    std::cin.ignore();  // Clear the input buffer before using getline
     std::getline(std::cin, color);
     if (color.empty()) {
         std::cerr << "Car color cannot be empty!\n";
@@ -233,7 +239,7 @@ void addCar() {
     std::cin >> costPerDay;
     if (std::cin.fail() || costPerDay <= 0) {
         std::cin.clear();
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Correct usage
         std::cerr << "Invalid cost per day. Please enter a positive number.\n";
         return;
     }
@@ -246,16 +252,14 @@ void addCar() {
 
         EventLogger::log("Added car: " + newCar->getMake() + " " + newCar->getModel());
 
-        // Convert vector of Vehicle* to vector of Car objects (by dereferencing the pointers)
         std::vector<Car> cars;
         for (auto& vehicle : vehicles) {
             Car* car = dynamic_cast<Car*>(vehicle);
             if (car) {
-                cars.push_back(*car);  // Dereference pointer to get the object
+                cars.push_back(*car);
             }
         }
 
-        // Save the cars to file after adding
         Car::saveCarsToFile(cars, "cars.txt");
 
         std::cout << "Car added successfully!\n";
@@ -264,6 +268,7 @@ void addCar() {
         std::cerr << "Error: " << e.what() << std::endl;
     }
 }
+
 
 void deleteCar() {
     std::cout << "Enter the car ID to delete: ";
@@ -277,16 +282,14 @@ void deleteCar() {
             delete car;
             vehicles.erase(it);
 
-            // Convert vector of Vehicle* to vector of Car objects (by dereferencing the pointers)
             std::vector<Car> cars;
             for (auto& vehicle : vehicles) {
                 Car* car = dynamic_cast<Car*>(vehicle);
                 if (car) {
-                    cars.push_back(*car);  // Dereference pointer to get the object
+                    cars.push_back(*car);
                 }
             }
 
-            // Save the remaining cars to file after deletion
             Car::saveCarsToFile(cars, "cars.txt");
             std::cout << "Car deleted successfully.\n";
             return;
@@ -295,20 +298,16 @@ void deleteCar() {
     std::cout << "Car with ID " << carID << " not found.\n";
 }
 
-
-// Return car function
 void returnCar() {
     std::cout << "Enter the car ID to return: ";
     int carID;
     std::cin >> carID;
 
-    // Find the customer who rented this car
     auto customerIt = std::find_if(users.begin(), users.end(), [carID](Customer* user) {
         return user->getRentedCarID() == carID;
         });
 
     if (customerIt != users.end()) {
-        // Mark the car as available
         for (auto& vehicle : vehicles) {
             Car* car = dynamic_cast<Car*>(vehicle);
             if (car && car->getCarID() == carID) {
@@ -318,32 +317,41 @@ void returnCar() {
             }
         }
 
-        // Remove the customer from the users vector
         users.erase(customerIt);
         std::cout << "Customer and rental information removed from records.\n";
 
-        // Save the updated users to file
         saveUsersToFile();
         EventLogger::log("Returned car with ID: " + std::to_string(carID));
+
+        // Send message to the server
+        ServerLogger logger;
+        if (logger.connectToServer("127.0.0.1", 5000)) {  // Connect to the server (use your server's IP and port)
+            logger.log("Car ID " + std::to_string(carID) + " returned");
+        }
     }
     else {
         std::cout << "No rental found for car ID " << carID << ".\n";
     }
 }
 
+
+// Initialize the ServerLogger instance
+ServerLogger serverLogger;
+
+
+
 using MenuAction = void(*)();
 
 void displayMenu() {
     int choice;
 
-    // Array of function pointers, each corresponding to a menu option
     MenuAction menuActions[] = {
-        viewVehicles,  // 1. View All Cars
-        rentCar,       // 2. Rent a Car
-        addCar,        // 3. Add a Car
-        deleteCar,     // 4. Delete a Car
-        viewUsers,     // 5. View Users
-        returnCar      // 6. Return a Car
+        viewVehicles, 
+        rentCar,     
+        addCar,      
+        deleteCar,   
+        viewUsers,  
+        returnCar 
     };
 
     do {
@@ -353,17 +361,16 @@ void displayMenu() {
         std::cout << "  1. View All Cars                 \n";
         std::cout << "  2. Rent a Car                    \n";
         std::cout << "  3. Add a Car                     \n";
-        std::cout << "  4. Delete a Car                  \n";  // Delete option
+        std::cout << "  4. Delete a Car                  \n";  
         std::cout << "  5. View Users                    \n";
-        std::cout << "  6. Return a Car                  \n";  // Return car option
+        std::cout << "  6. Return a Car                  \n"; 
         std::cout << "  7. Exit                          \n";
         std::cout << "=====================================\n";
         std::cout << "Enter your choice: ";
         std::cin >> choice;
 
         if (choice >= 1 && choice <= 6) {
-            // Call the appropriate function using function pointers
-            menuActions[choice - 1]();  // Call the function based on the user's choice
+            menuActions[choice - 1]();
         }
         else if (choice == 7) {
             std::cout << "Exiting the program.\n";
@@ -376,28 +383,32 @@ void displayMenu() {
 }
 
 int main() {
-
     std::cout << "Welcome to the Vehicle Rental System!\n";
+    std::cout << "-------------------------------------\n";
 
     if (!login()) {
         std::cerr << "Login failed! Exiting...\n";
         return 1;
     }
 
-    loadCarsFromFile();  // Load cars from file on startup
-    loadUsersFromFile();
-
-    // Check if cars are empty before adding default cars
-    if (vehicles.empty()) {
-        addDefaultCars();    // Add default cars only if no cars were loaded from the file
+    // Connect to the server before renting or returning cars
+    ServerLogger serverLogger;
+    if (!serverLogger.connectToServer("127.0.0.1", 5000)) {
+        std::cerr << "Failed to connect to server." << std::endl;
+        return 1;
     }
 
-    // Set the locale to British English
-    std::setlocale(LC_ALL, "en_GB.UTF-8");
+    // Load cars and users
+    loadCarsFromFile();
+    loadUsersFromFile();
 
-    displayMenu();
+    if (vehicles.empty()) {
+        addDefaultCars();  // Add default cars if no cars exist
+    }
 
-    // Cleanup: Delete dynamically allocated memory
+    displayMenu();  // Display menu for further interactions
+
+    // Cleanup dynamic memory allocations
     for (auto user : users) delete user;
     for (auto vehicle : vehicles) delete vehicle;
 
