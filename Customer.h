@@ -3,20 +3,28 @@
 
 #include <string>
 
+// Forward declaration of the friend function
+class Customer;
+
+// Declare the friend function
+void displayCustomerAndCarDetails(const Customer& customer);
+
 class Customer {
+    // ENCAPSULATION. Encapsulated attributes ensuring that sensitive 
+    //data is not directly accessible, maintaining encapsulation.
 private:
     std::string firstName;
     std::string lastName;
     std::string contactDetails;
     int rentalDuration; // Number of days the car is rented for
 
-    // New attributes to store booked car details
+    // Attributes to store booked car details
     int rentedCarID;
     std::string rentedCarMake;
     std::string rentedCarModel;
 
 public:
-    // Updated constructor to include car details
+    // Constructor
     Customer(const std::string& firstName, const std::string& lastName, const std::string& contactDetails,
         int rentalDuration, int carID = -1, const std::string& carMake = "", const std::string& carModel = "");
 
@@ -28,11 +36,14 @@ public:
     // Display customer details
     void displayCustomerInfo() const;
 
-    // Add these getter methods to access the customer attributes
+    // Add getter methods for customer attributes
     std::string getFirstName() const { return firstName; }
     std::string getLastName() const { return lastName; }
     std::string getContactDetails() const { return contactDetails; }
     int getRentalDuration() const { return rentalDuration; }
+
+    // Declare friend function
+    friend void displayCustomerAndCarDetails(const Customer& customer);
 };
 
 #endif

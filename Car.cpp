@@ -6,7 +6,8 @@
 // Constructor definition
 Car::Car(int id, const std::string& make, const std::string& model, int year, const std::string& color, double costPerDay)
     : Vehicle(make, model, year, costPerDay), id(id), available(true), isRented(false) {
-    this->color = color;  // Set the color after calling the base class constructor
+    this->year = year;
+    this->color = color;
 }
 
 // Getter and Setter methods
@@ -36,6 +37,18 @@ std::string Car::getModel() const {
 
 double Car::calculateRentalCost(int days) const {
     return days * costPerDay;
+}
+
+// Friend function definition
+void displayCarDetails(const Car& car) {
+    std::cout << "Car ID: " << car.id << "\n"
+        << "Make: " << car.make << "\n"
+        << "Model: " << car.model << "\n"
+        << "Year: " << car.year << "\n"
+        << "Color: " << car.color << "\n"
+        << "Cost Per Day: $" << car.costPerDay << "\n"
+        << "Availability: " << (car.available ? "Available" : "Not Available") << "\n"
+        << "Rental Status: " << (car.isRented ? "Rented" : "Not Rented") << "\n";
 }
 
 void Car::displayInfo() const {
@@ -72,12 +85,12 @@ void Car::displayInfo() const {
 
 // Static file operations
 void Car::saveCarsToFile(const std::vector<Car>& cars, const std::string& filename) {
-    std::ofstream file(filename);
+    std::ofstream file(filename, std::ios::trunc);  // Open the file in truncation mode to overwrite existing content
     if (file.is_open()) {
         for (const Car& car : cars) {
             file << car.getCarID() << "," << car.getMake() << "," << car.getModel() << ","
                 << car.getYear() << "," << car.getColor() << "," << car.calculateRentalCost(1) << ","
-                << (car.getIsRented() ? "rented" : "available") << "\n"; // Save rental status
+                << (car.getIsRented() ? "rented" : "available") << "\n";  // Save rental status
         }
         file.close();
     }
@@ -85,6 +98,7 @@ void Car::saveCarsToFile(const std::vector<Car>& cars, const std::string& filena
         std::cerr << "Error opening file for saving cars!\n";
     }
 }
+
 
 void Car::loadCarsFromFile(std::vector<Car>& cars, const std::string& filename) {
     std::ifstream file(filename);
@@ -101,8 +115,10 @@ void Car::loadCarsFromFile(std::vector<Car>& cars, const std::string& filename) 
             file.ignore();
             std::getline(file, color, ',');
             file >> costPerDay;
+            file.ignore(); // Skip extra comma or newline
             std::getline(file, rentedStatus); // Load rental status
-            bool isRented = (rentedStatus == "rented");
+
+            bool isRented = (rentedStatus == "rented" || rentedStatus == "true");
             Car car(id, make, model, year, color, costPerDay);
             car.setIsRented(isRented);
             cars.push_back(car);
@@ -113,6 +129,7 @@ void Car::loadCarsFromFile(std::vector<Car>& cars, const std::string& filename) 
         std::cerr << "Error opening file for loading cars!\n";
     }
 }
+
 
 // Static function to save rental data
 void Car::saveRentalData(const std::vector<Car>& cars, const std::string& filename) {

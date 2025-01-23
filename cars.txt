@@ -1,7 +1,6 @@
-1,Nissan,Skyline R34 GT-R V-Spec II,2001,Blue,1200
-2,Toyota,Supra MK4 TT6 Single Turbo,1997,White,700
-3,Honda,NSX NA1,1991,Red,800
-4,Mazda,RX7,2000,Silver with Fortune Body Kit,1000
-5,Mitsubishi,Lancer Evo,2001,White,600
-6,Nissan,200SX,1996,Orange,1000
-7,Toyota,MR2,1989,Black,250
+1,Nissan,Skyline R34 GT-R V-Spec II,2001,Blue,1200,available
+2,Toyota,Supra MK4 TT6 Single Turbo,1997,White,700,available
+3,Honda,NSX NA1,1991,Red,800,available
+4,Mazda,RX7 Fortune Body Kit,2000,Silver,1000,available
+5,Mitsubishi,Lancer Evo,2001,White,600,available
+6,Nissan,200SX,1996,Orange,1000,available

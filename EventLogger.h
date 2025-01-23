@@ -13,7 +13,6 @@ private:
     static std::ofstream logFile;
 
 public:
-    // EventLogger.h
     EventLogger(const std::string& filename);
     void saveCustomerDetails(const Customer& customer);  // Declare the function
 

@@ -1,1 +1,8 @@
-
+Added car: Acura Integra
+Rented car: Nissan Skyline R34 GT-R V-Spec II to Martin Konecny
+Deleted car: Mazda Miata
+Returned car with ID: 1 by customer: Martin Konecny
+Rented car: Nissan Skyline R34 GT-R V-Spec II to Martin Konecny
+Added car: mazda miata
+Added car: Mazda Miata
+Deleted car: Mazda Miata
