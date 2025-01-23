@@ -52,7 +52,7 @@ void EventLogger::close() {
     }
 }
 
-
+// saves customer details in a text file
 void EventLogger::saveCustomerDetails(const Customer& customer) {
     std::ofstream outFile("customer_rentals.txt", std::ios::app);
     if (outFile.is_open()) {

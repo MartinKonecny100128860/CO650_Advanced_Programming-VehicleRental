@@ -20,8 +20,9 @@ std::vector<Customer*> users;    // Pointer to Customer objects
 std::vector<Vehicle*> vehicles;  // Pointer to Vehicle objects
 std::vector<Car*> car;           // Pointer to Car objects
 
+// This function saves all car objects in the 'vehicles' vector to a file named "cars.txt" in overwrite mode.
 void saveCarsToFile() {
-    std::ofstream carFile("cars.txt", std::ios::trunc);  // Open file in overwrite mode
+    std::ofstream carFile("cars.txt", std::ios::trunc);  
     if (carFile.is_open()) {
         for (const auto& vehicle : vehicles) {
             Car* car = dynamic_cast<Car*>(vehicle);
@@ -41,6 +42,7 @@ void saveCarsToFile() {
     }
 }
 
+// This function reads car data from the "cars.txt" file and populates the 'vehicles' vector with car objects.
 void loadCarsFromFile() {
     std::ifstream carFile("cars.txt");
     if (carFile.is_open()) {
@@ -79,6 +81,7 @@ void loadCarsFromFile() {
     }
 }
 
+// This function saves all user data from the 'users' vector to a file named "users.txt".
 void saveUsersToFile() {
     std::ofstream userFile("users.txt");
     if (userFile.is_open()) {
@@ -98,6 +101,7 @@ void saveUsersToFile() {
     }
 }
 
+// This function loads user data from the "users.txt" file and populates the 'users' vector while updating car availability.
 void loadUsersFromFile() {
     std::ifstream userFile("users.txt");
     if (userFile.is_open()) {
@@ -132,6 +136,10 @@ void loadUsersFromFile() {
     }
 }
 
+// This function implements a simple login system for an admin user.
+// It checks the username and password against predefined values, allowing up to 3 attempts.
+// If the login is successful, it returns true; otherwise, it exits the program after 3 failed attempts.
+// Feedback is provided for invalid credentials during the allowed attempts.
 bool login() {
     std::string username, password;
     const std::string correctUsername = "admin";
@@ -160,6 +168,10 @@ bool login() {
     std::exit(EXIT_FAILURE);  // Terminates the program
 }
 
+// This function adds a set of default car objects to the 'vehicles' vector.
+// Each car is created with a unique ID, make, model, year, color, and cost per day.
+// These default cars provide initial data for the program when no cars are manually added.
+// It helps simulate a populated system for testing or demonstration purposes.
 void addDefaultCars() {
     vehicles.push_back(new Car(1, "Nissan", "Skyline R34 GT-R V-Spec II", 2001, "Blue", 1200.00));
     vehicles.push_back(new Car(2, "Toyota", "Supra MK4 TT6 Single Turbo", 1997, "White", 700.00));
@@ -169,12 +181,18 @@ void addDefaultCars() {
     vehicles.push_back(new Car(6, "Nissan", "200SX", 1996, "Orange", 1000.00));
 }
 
+// This function iterates through the 'vehicles' vector and calls the `displayInfo()` method on each vehicle.
+// It ensures that the details of all vehicles in the system are displayed, leveraging polymorphism.
+// Each vehicle's specific `displayInfo()` implementation is invoked based on its actual type at runtime.
 void viewVehicles() {
     for (auto vehicle : vehicles) {
         vehicle->displayInfo();
     }
 }
 
+// This function displays information about all registered users in the system.
+// It iterates through the 'users' vector and calls the `displayCustomerInfo()` method for each user.
+// The method outputs the details of each customer, providing an overview of all users in the system.
 void viewUsers() {
     std::cout << "\n--- Registered Users ---\n";
     for (const auto& user : users) {
@@ -241,7 +259,10 @@ void rentCar() {
     std::cout << "Car with ID " << carID << " not available for rent.\n";
 }
 
-
+// This function allows the user to add a new car to the system by inputting its details.
+// It validates the input for make, model, year, color, and cost per day using exception handling.
+// If valid, a new car object is created, added to the 'vehicles' vector, and logged in "cars.txt".
+// In case of invalid input or file write errors, appropriate error messages are displayed.
 void addCar() {
     std::string make, model, color;
     int year;
@@ -321,7 +342,10 @@ void addCar() {
     }
 }
 
-
+// This function deletes a car from the 'vehicles' vector based on the provided car ID.
+// It identifies the car using its ID, removes it from memory, and updates the "cars.txt" file.
+// If no car with the specified ID is found, a message is displayed to inform the user.
+// Events related to car deletion are logged using the EventLogger.
 void deleteCar() {
     std::cout << "Enter the car ID to delete: ";
     int carID;
@@ -367,7 +391,10 @@ void deleteCar() {
 }
 
 
-// Function declaration to return a rented car and mark it as available again
+// This function handles the return of a rented car by marking it as available and removing the associated rental record.
+// It identifies the customer who rented the car, updates the car's availability, and logs the event.
+// Customer details and rental information are removed from the 'users' vector, and changes are saved to file.
+// A message is optionally sent to a server to log the return event.
 void returnCar() {
     std::cout << "Enter the car ID to return: ";
     int carID;
@@ -418,14 +445,15 @@ void returnCar() {
     }
 }
 
-
 // Initialise the ServerLogger instance
 ServerLogger serverLogger;
 
-
-
 using MenuAction = void(*)(); // Defining a functional pointer type named 'MenuAction'
 
+// This function displays the main menu and allows the user to select an option.
+// It uses an array of function pointers (`menuActions`) to map menu options to corresponding functions.
+// Based on the user's choice, the appropriate function (e.g., viewVehicles, addCar, etc.) is invoked.
+// The menu loop continues until the user selects the exit option.
 void displayMenu() {
     int choice;
 
@@ -468,7 +496,9 @@ void displayMenu() {
     } while (true); // Keep displaying the menu until a valid exit option is selected
 }
 
-
+// The main function serves as the entry point for the Vehicle Rental System program.
+// It performs user login, connects to the server, loads data from files, and initializes default cars if necessary.
+// The main menu is displayed for user interaction, and dynamic memory allocations are cleaned up before exiting.
 int main() {
     std::cout << "Welcome to the Vehicle Rental System!\n";
     std::cout << "-------------------------------------\n";
